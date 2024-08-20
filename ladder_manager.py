@@ -28,7 +28,10 @@ class LadderManager:
 
     def register_team(self, division_type, team_name, *members):
         """
-        
+        Takes the input from the discord user and
+        uses a series of help and validation functions
+        and conditions to make sure the correct information
+        has been given to make a team correctly.
         """
         # Check if team name is unique and no other team is named the same in ANY division
         if is_team_name_unique(team_name):
@@ -57,3 +60,9 @@ class LadderManager:
         else:
             duplicate_team_name = f"Team {team_name} is already being used. Please choose another team name."
             return duplicate_team_name
+        
+    def remove_team(self, division_type, team_name):
+        """
+        Finds the correct team and tells
+        the database to remove them completely
+        """
