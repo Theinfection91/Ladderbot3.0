@@ -36,13 +36,51 @@ def is_team_name_unique(team_name: str) -> bool:
     Returns:
         bool: True if the team name is unique, False otherwise.
     """
-    conn = sqlite3.connect(LADDERBOT_DB)
+    conn = connect_db()
     cursor = conn.cursor()
 
     cursor.execute("SELECT COUNT(*) FROM teams WHERE team_name = ?", (team_name,))
     count = cursor.fetchone()[0]
     conn.close()
     return count == 0
+
+def is_member_registered(division_type, member_name):
+    """
+    TODO
+
+    Checks if a given player is already registered
+    to a team in a given division
+
+    Args:
+        division_type (str): The division type to check.
+        member_name (str): The members name to check.
+
+    Returns:
+        bool: True if player is on team in division already, False otherwise.
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT members FROM teams WHERE division = ?", (division_type,))
+    results = cursor.fetchall()
+
+    conn.close()
+
+    # Iterate over each team's members string in the results
+    for result in results:
+        members_string = result[0]
+
+        # Split string into list for names and strip white space
+        members_list = [member.strip() for member in members_string.split(",")]
+
+        # Look for member_name in the list
+        if member_name in members_list:
+            return True
+    
+    # If no match found, return False
+    return False
+
+
 
 def db_register_team(division_type: str, team_name: str, members: str):
     """

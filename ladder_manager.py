@@ -1,6 +1,6 @@
 # Import the different divisions here
 
-from database import initialize_database, db_register_team, is_team_name_unique
+from database import initialize_database, db_register_team, is_team_name_unique, is_member_registered
 from utils import is_correct_member_size, create_members_string
 
 class LadderManager:
@@ -42,6 +42,19 @@ class LadderManager:
                 # Check if correct amount of members was given for the division type
                 if is_correct_member_size(division_type, *members):
 
+                    # Create a list of all the members display names
+
+                    # NOTE: Uncomment triple quotes for
+                    member_display_names = [member.display_name for member in members]
+
+                    # Checks every members display name against the database
+                    for member_display_name in member_display_names:
+                        
+                        # If a player is already registered on a team in a given division type the process is stopped
+                        if is_member_registered(division_type, member_display_name):     
+                            member_registered = f"{member_display_name} is already registered on a team in the {division_type} division. Please try again."
+                            return member_registered
+                        
                     # Turn all members into a string for the database
                     members_string = create_members_string(*members)
 
@@ -49,7 +62,7 @@ class LadderManager:
                     db_register_team(division_type, team_name, members_string)
 
                     # Create and return confirmation message
-                    register_team_success = f"Team {team_name} has been registered in the {division_type} division with the following members: {', '.join([member.display_name for member in members])}"
+                    register_team_success = f"Team {team_name} has been registered in the {division_type} division with the following members: {members_string}"
                     return register_team_success
                 else:
                     incorrect_member_count = "Please enter the correct amount of members depending on the division type."

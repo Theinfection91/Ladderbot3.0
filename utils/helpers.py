@@ -2,14 +2,13 @@ import discord
 
 def create_members_string(*members):
     """
-    Formats all members given into a string
-    to store inside the database
+    Formats all members given into a CSV string
+    to store inside the database.
     """
-    display_names = ""
     if len(members) == 1:
-        display_names += member.display_name
-        return display_names
+        return members[0].display_name
     
-    for member in members:
-        display_names += f"{member.display_name}, "
+    # Join member display names with a comma separator
+    display_names = ", ".join(member.display_name for member in members)
+    
     return display_names

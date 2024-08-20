@@ -19,18 +19,18 @@ class Ladderbot(commands.Cog):
     
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def register_team(self, ctx, division_type: str, team_name: str, *members: discord.Member):
+    async def register_team(self, ctx, team_name: str,  division_type: str, *members: discord.Member):
         """
         Registers a new team within a specified division.
 
         Args:
             ctx (discord.ext.commands.Context): The context of the command.
-            division_type (str): The type of the division (1v1, 2v2, or 3v3).
             team_name (str): The name of the team.
+            division_type (str): The type of the division (1v1, 2v2, or 3v3).
             *members (discord.Member): The members of the team.
 
         Example:
-            /register_team 2v2 Alpha @Ixnay @Flaw
+            /register_team Alpha 2v2 @Ixnay @Flaw
 
         Output:
             Team Alpha has been registered in the 2v2 division with the following members: Ixnay, Flaw
