@@ -1,3 +1,5 @@
+#database/database_setup.py
+
 import sqlite3
 from config.settings import LADDERBOT_DB
 

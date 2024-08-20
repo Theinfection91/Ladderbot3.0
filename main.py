@@ -36,16 +36,16 @@ class Ladderbot(commands.Cog):
         Output:
             Team Alpha has been registered in the 2v2 division with the following members: Ixnay, Flaw
         """
-
+        result_message = self.ladder_manager.register_team(division_type, team_name, members)
         # Send a confirmation message to the channel
-        #message = f"Team {team_name} has been registered in the {division_type} division with the following members: {', '.join([member.display_name for member in members])}"
-        #await ctx.send(message)
+        #result_message = f"Team {team_name} has been registered in the {division_type} division with the following members: {', '.join([member.display_name for member in members])}"
+        await ctx.send(result_message)
 
 # Define bot prefix and intents
 intents = discord.Intents.default()
 intents.typing = False
 intents.presences = False
-intents.members = True  # Ensure the bot has the 'members' intent enabled
+intents.members = True
 intents.message_content = True
 
 # Initialize bot with command prefix and intents
