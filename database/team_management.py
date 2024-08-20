@@ -1,5 +1,5 @@
 import sqlite3
-from config.settings import LADDERBOT_DB
+from config import LADDERBOT_DB
 
 def connect_db():
     return sqlite3.connect(LADDERBOT_DB)
@@ -50,7 +50,7 @@ def db_register_team(division_type: str, team_name: str, members: str):
     in ladderbot.db based on the division type given.
     """
     # Count the total teams in given division and assign team rank to bottom
-    starting_rank = (count_teams(division_type) + 1)
+    starting_rank = count_teams(division_type) + 1
     
     # Create teams with 0 wins and losses
     default_win_loss = 0
