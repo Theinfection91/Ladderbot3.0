@@ -58,6 +58,17 @@ class Ladderbot(commands.Cog):
         result_message = self.ladder_manager.remove_team(division_type, team_name)
         await ctx.send(result_message)
 
+    @commands.command()
+    async def challenge(self, ctx, challenger_team, challenged_team):
+        """
+        This challenge function will be usable by everyone
+        and users will not need to specify which division
+        since team names are set to be unique across
+        all divisions (Cant have a Team Alpha in 1v1 and Team Alpha in 2v2)
+        """
+        result_message = self.ladder_manager.challenge(challenger_team, challenged_team)
+        await ctx.send(result_message)
+
 # Define bot prefix and intents
 intents = discord.Intents.default()
 intents.typing = False

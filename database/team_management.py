@@ -44,7 +44,7 @@ def is_team_name_unique(team_name: str) -> bool:
     conn.close()
     return count == 0
 
-def does_team_exist(division_type, team_name):
+def does_team_exist(division_type: str, team_name: str):
     """
     Checks if a team name exists within
     a specified division type.
@@ -57,7 +57,7 @@ def does_team_exist(division_type, team_name):
     conn.close()
     return count > 0
 
-def is_member_registered(division_type, member_name):
+def is_member_registered(division_type: str, member_name: str):
     """
     TODO
 
@@ -92,6 +92,13 @@ def is_member_registered(division_type, member_name):
     
     # If no match found, return False
     return False
+
+def check_team_division(team_name: str):
+    """
+    Checks what division a team is in
+    and returns the division type back
+    in a string
+    """
 
 def db_register_team(division_type: str, team_name: str, members: str):
     """

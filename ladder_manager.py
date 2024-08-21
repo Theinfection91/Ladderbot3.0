@@ -1,6 +1,6 @@
 # Import the different divisions here
 
-from database import initialize_database, db_register_team, db_remove_team, is_team_name_unique, is_member_registered, does_team_exist
+from database import initialize_database, db_register_team, db_remove_team, is_team_name_unique, is_member_registered, does_team_exist, is_team_challenged, has_team_challenged
 from utils import is_correct_member_size, create_members_string
 
 class LadderManager:
@@ -84,3 +84,30 @@ class LadderManager:
             return f"Team {team_name} from the {division_type} division has been removed from the Ladder."
         else:
             return f"No team named Team {team_name} found for the {division_type} division. Please try again."
+        
+    def challenge(challenger_team, challenged_team):
+        """
+        Checks if teams exist, checks what division
+        type the teams are in, checks if either team
+        are currently under a challenge, checks if
+        challenger team is one or two ranks below the
+        challenged team,
+        """
+        # Check if both teams exist within the same division and stores which divison if so.
+        if does_team_exist('1v1', challenger_team) and does_team_exist('1v1', challenged_team):
+            same_division = "1v1"
+        if does_team_exist('2v2', challenger_team) and does_team_exist('2v2', challenged_team):
+            same_division = "2v2"
+        if does_team_exist('3v3', challenger_team) and does_team_exist('3v3', challenged_team):
+            same_division = "3v3"
+        
+        # Check if either team has challenged or already been challenged
+        if is_team_challenged(same_division, challenged_team):
+            return f"{challenged_team} has already been challenged by another team and must complete that match first!"
+        
+        if has_team_challenged(same_division, challenger_team):
+            return f"{challenger_team} has already sent out a challenge to a team and must complete that match first!"
+
+        # Check if the challenging team is challenging either one or two ranks above them
+        
+
