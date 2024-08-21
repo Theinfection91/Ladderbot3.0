@@ -1,6 +1,6 @@
 # Import the different divisions here
 
-from database import initialize_database, db_register_team, db_remove_team, is_team_name_unique, is_member_registered, does_team_exist, is_team_challenged, has_team_challenged
+from database import initialize_database, db_register_team, db_remove_team, is_team_name_unique, is_member_registered, does_team_exist, is_team_challenged, has_team_challenged, give_team_rank, db_register_challenge
 from utils import is_correct_member_size, create_members_string
 
 class LadderManager:
@@ -100,6 +100,15 @@ class LadderManager:
             same_division = "2v2"
         if does_team_exist('3v3', challenger_team) and does_team_exist('3v3', challenged_team):
             same_division = "3v3"
+        else:
+            return f"I couldn't find one or both teams. Check if teams are both in the same division and registered and try again."
+        
+        # Check if the challenging team is challenging either one or two ranks above them
+        challenger_rank = give_team_rank(challenger_team)
+        challenged_rank = give_team_rank(challenged_team)
+
+        if challenged_rank > challenger_rank or challenged_rank <= challenger_rank - 3:
+            return f"Teams can only challenge other teams up to two ranks above their current rank."
         
         # Check if either team has challenged or already been challenged
         if is_team_challenged(same_division, challenged_team):
@@ -107,7 +116,7 @@ class LadderManager:
         
         if has_team_challenged(same_division, challenger_team):
             return f"{challenger_team} has already sent out a challenge to a team and must complete that match first!"
-
-        # Check if the challenging team is challenging either one or two ranks above them
         
-
+        # Once all checks are passed then register the challenge in the correct table
+        db_register_challenge(same_division, challenger_team, challenged_team)
+        return f"Team {challenger_team} has challenged Team {challenged_team} in the {same_division} division!"

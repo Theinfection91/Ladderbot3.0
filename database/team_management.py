@@ -93,6 +93,19 @@ def is_member_registered(division_type: str, member_name: str):
     # If no match found, return False
     return False
 
+def give_team_rank(division_type: str, team_name: str):
+    """
+    Returns the rank of a given team in a given division type
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT rank FROM teams WHERE division = ? AND team_name = ?", (division_type, team_name,))
+    rank_result = cursor.fetchone()[0]
+
+    conn.close()
+    return rank_result
+
 def check_team_division(team_name: str):
     """
     Checks what division a team is in
