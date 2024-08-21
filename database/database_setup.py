@@ -41,7 +41,8 @@ def create_tables(conn):
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         match_id TEXT NOT NULL,
         challenger TEXT NOT NULL,
-        challenged TEXT NOT NULL                   
+        challenged TEXT NOT NULL,
+        status TEXT NOT NULL                   
 )
 ''')
     
@@ -51,7 +52,8 @@ def create_tables(conn):
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         match_id TEXT NOT NULL,
         challenger TEXT NOT NULL,
-        challenged TEXT NOT NULL                   
+        challenged TEXT NOT NULL,
+        status TEXT NOT NULL                   
 )
 ''')
     
@@ -61,7 +63,24 @@ def create_tables(conn):
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         match_id TEXT NOT NULL,
         challenger TEXT NOT NULL,
-        challenged TEXT NOT NULL                   
+        challenged TEXT NOT NULL,
+        status TEXT NOT NULL                   
+)
+''')
+    
+    # Create a table to hold various states
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS states (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ladder_1v1_running TEXT NOT NULL,
+    ladder_2v2_running TEXT NOT NULL,
+    ladder_3v3_running TEXT NOT NULL,
+    challenges_1v1_channel INTEGER NOT NULL,
+    challenges_2v2_channel INTEGER NOT NULL,
+    challenges_3v3_channel INTEGER NOT NULL,   
+    standings_1v1_channel INTEGER NOT NULL,
+    standings_2v2_channel INTEGER NOT NULL,
+    standings_3v3_channel INTEGER NOT NULL            
 )
 ''')
     
