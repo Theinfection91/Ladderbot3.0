@@ -40,21 +40,23 @@ class Ladderbot(commands.Cog):
     
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def remove_team(self, ctx, division_type, team_name):
+    async def remove_team(self, ctx, team_name, division_type):
         """
         Removes a team within a specifed division
 
         Args:
             ctx (discord.ext.commands.Context): The context of the command.
-            division_type (str): The type of the division (1v1, 2v2, or 3v3).
             team_name (str): The name of the team.
+            division_type (str): The type of the division (1v1, 2v2, or 3v3).
 
         Example:
-            /remove_team 1v1 Delta
+            /remove_team Delta 1v1
 
         Output:
-            Team Delta has been removed from the 1v1 division by an Admin.
+            Team Delta from the 1v1 division has been removed from the Ladder.
         """
+        result_message = self.ladder_manager.remove_team(division_type, team_name)
+        await ctx.send(result_message)
 
 # Define bot prefix and intents
 intents = discord.Intents.default()

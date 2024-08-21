@@ -1,6 +1,6 @@
 # Import the different divisions here
 
-from database import initialize_database, db_register_team, is_team_name_unique, is_member_registered
+from database import initialize_database, db_register_team, db_remove_team, is_team_name_unique, is_member_registered, does_team_exist
 from utils import is_correct_member_size, create_members_string
 
 class LadderManager:
@@ -42,9 +42,8 @@ class LadderManager:
                 # Check if correct amount of members was given for the division type
                 if is_correct_member_size(division_type, *members):
 
-                    # Create a list of all the members display names
-
-                    # NOTE: Uncomment triple quotes for
+                    # NOTE: Uncomment triple quotes to check if member is already registered on division type team
+                    """# Create a list of all the members display names
                     member_display_names = [member.display_name for member in members]
 
                     # Checks every members display name against the database
@@ -53,7 +52,8 @@ class LadderManager:
                         # If a player is already registered on a team in a given division type the process is stopped
                         if is_member_registered(division_type, member_display_name):     
                             member_registered = f"{member_display_name} is already registered on a team in the {division_type} division. Please try again."
-                            return member_registered
+                            return member_registered"""
+                    # NOTE
                         
                     # Turn all members into a string for the database
                     members_string = create_members_string(*members)
@@ -79,3 +79,8 @@ class LadderManager:
         Finds the correct team and tells
         the database to remove them completely
         """
+        if does_team_exist(division_type, team_name):
+            db_remove_team(division_type, team_name)
+            return f"Team {team_name} from the {division_type} division has been removed from the Ladder."
+        else:
+            return f"No team named Team {team_name} found for the {division_type} division. Please try again."

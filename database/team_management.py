@@ -44,6 +44,19 @@ def is_team_name_unique(team_name: str) -> bool:
     conn.close()
     return count == 0
 
+def does_team_exist(division_type, team_name):
+    """
+    Checks if a team name exists within
+    a specified division type.
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM teams WHERE division = ? AND team_name = ?", (division_type, team_name))
+    count = cursor.fetchone()[0]
+    conn.close()
+    return count > 0
+
 def is_member_registered(division_type, member_name):
     """
     TODO
@@ -80,8 +93,6 @@ def is_member_registered(division_type, member_name):
     # If no match found, return False
     return False
 
-
-
 def db_register_team(division_type: str, team_name: str, members: str):
     """
     INSERT's given data into correct table
@@ -104,5 +115,21 @@ def db_register_team(division_type: str, team_name: str, members: str):
 ''', (team_name, division_type, starting_rank, default_win_loss, default_win_loss, members))
     
     # Commit and close the connection to the database
+    conn.commit()
+    conn.close()
+
+def db_remove_team(division_type: str, team_name: str):
+    """
+    DELETE's a given team from a given division
+    in the ladderbot.db
+    """
+    # Connect to ladderbot.db and create cursor
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    # DELETE data with specified parameters
+    cursor.execute("DELETE FROM teams WHERE team_name = ? AND division = ?", (team_name, division_type))
+
+    # Commit and close connection
     conn.commit()
     conn.close()
