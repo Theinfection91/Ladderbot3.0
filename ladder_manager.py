@@ -1,6 +1,6 @@
 # Import the different divisions here
 
-from database import initialize_database, db_register_team, db_remove_team, is_team_name_unique, is_member_registered, does_team_exist, is_team_challenged, has_team_challenged, give_team_rank, db_register_challenge
+from database import initialize_database, db_register_team, db_remove_team, is_team_name_unique, is_member_registered, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, give_team_rank, db_register_challenge
 from utils import is_correct_member_size, create_members_string
 
 class LadderManager:
@@ -79,13 +79,13 @@ class LadderManager:
         Finds the correct team and tells
         the database to remove them completely
         """
-        if does_team_exist(division_type, team_name):
+        if does_team_exist(team_name):
             db_remove_team(division_type, team_name)
             return f"Team {team_name} from the {division_type} division has been removed from the Ladder."
         else:
             return f"No team named Team {team_name} found for the {division_type} division. Please try again."
         
-    def challenge(challenger_team, challenged_team):
+    def challenge(self, challenger_team, challenged_team):
         """
         Checks if teams exist, checks what division
         type the teams are in, checks if either team
@@ -93,30 +93,40 @@ class LadderManager:
         challenger team is one or two ranks below the
         challenged team,
         """
-        # Check if both teams exist within the same division and stores which divison if so.
-        if does_team_exist('1v1', challenger_team) and does_team_exist('1v1', challenged_team):
-            same_division = "1v1"
-        if does_team_exist('2v2', challenger_team) and does_team_exist('2v2', challenged_team):
-            same_division = "2v2"
-        if does_team_exist('3v3', challenger_team) and does_team_exist('3v3', challenged_team):
-            same_division = "3v3"
-        else:
-            return f"I couldn't find one or both teams. Check if teams are both in the same division and registered and try again."
+        # Check if both teams exist
+        if not does_team_exist(challenger_team):
+            return f"No team found by the name of {challenger_team}."
         
+        if not does_team_exist(challenged_team):
+            return f"No team found by the name of {challenged_team}."
+        
+        # Check if both teams exist within the same division and stores which divison if so
+        challenger_division = check_team_division(challenger_team)
+        challenged_division = check_team_division(challenged_team)
+        
+        if challenger_division != challenged_division:
+            return f"The teams are not in the same division."
+        
+        division_type = challenger_division
+        print(division_type)
+        print("Passed exist and division check")
         # Check if the challenging team is challenging either one or two ranks above them
-        challenger_rank = give_team_rank(challenger_team)
+        
+        """challenger_rank = give_team_rank(challenger_team)
         challenged_rank = give_team_rank(challenged_team)
-
+        print("Grabbed teams ranks")
         if challenged_rank > challenger_rank or challenged_rank <= challenger_rank - 3:
             return f"Teams can only challenge other teams up to two ranks above their current rank."
+        print("Teams can challenge based on ranks")
+        # Check if either team has challenged or already been challenged"""
         
-        # Check if either team has challenged or already been challenged
-        if is_team_challenged(same_division, challenged_team):
+        if is_team_challenged(division_type, challenged_team):
             return f"{challenged_team} has already been challenged by another team and must complete that match first!"
-        
-        if has_team_challenged(same_division, challenger_team):
+        print("team can be challenged")
+        if has_team_challenged(division_type, challenger_team):
             return f"{challenger_team} has already sent out a challenge to a team and must complete that match first!"
-        
+        print("challenger can challenge")
         # Once all checks are passed then register the challenge in the correct table
-        db_register_challenge(same_division, challenger_team, challenged_team)
-        return f"Team {challenger_team} has challenged Team {challenged_team} in the {same_division} division!"
+        db_register_challenge(division_type, challenger_team, challenged_team)
+        print("registered challenge")
+        return f"Team {challenger_team} has challenged Team {challenged_team} in the {division_type} division!"

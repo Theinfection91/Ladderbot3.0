@@ -75,7 +75,7 @@ def db_register_challenge(division_type: str, challenger_team: str, challenged_t
     if division_type == '1v1':
         cursor.execute('''
         INSERT INTO challenges_1v1 (match_id, challenger, challenged, status)
-        VALUE (?, ?, ?, ?)
+        VALUES (?, ?, ?, ?)
 ''', (challenger_team, challenger_team, challenged_team, status))
         
         conn.commit()
@@ -85,7 +85,7 @@ def db_register_challenge(division_type: str, challenger_team: str, challenged_t
     if division_type == '2v2':
         cursor.execute('''
         INSERT INTO challenges_2v2 (match_id, challenger, challenged, status)
-        VALUE (?, ?, ?, ?)
+        VALUES (?, ?, ?, ?)
 ''', (challenger_team, challenger_team, challenged_team, status))
         
         conn.commit()
@@ -95,7 +95,7 @@ def db_register_challenge(division_type: str, challenger_team: str, challenged_t
     if division_type == '3v3':
         cursor.execute('''
         INSERT INTO challenges_3v3 (match_id, challenger, challenged, status)
-        VALUE (?, ?, ?, ?)
+        VALUES (?, ?, ?, ?)
 ''', (challenger_team, challenger_team, challenged_team, status))
         
         conn.commit()

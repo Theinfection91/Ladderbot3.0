@@ -44,7 +44,7 @@ def is_team_name_unique(team_name: str) -> bool:
     conn.close()
     return count == 0
 
-def does_team_exist(division_type: str, team_name: str):
+def does_team_exist(team_name: str):
     """
     Checks if a team name exists within
     a specified division type.
@@ -52,7 +52,7 @@ def does_team_exist(division_type: str, team_name: str):
     conn = connect_db()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT COUNT(*) FROM teams WHERE division = ? AND team_name = ?", (division_type, team_name))
+    cursor.execute("SELECT COUNT(*) FROM teams WHERE team_name = ?", (team_name,))
     count = cursor.fetchone()[0]
     conn.close()
     return count > 0
@@ -95,16 +95,21 @@ def is_member_registered(division_type: str, member_name: str):
 
 def give_team_rank(division_type: str, team_name: str):
     """
-    Returns the rank of a given team in a given division type
+    Returns the rank of a given team in a given division type.
+    If the team does not exist, returns None.
     """
     conn = connect_db()
     cursor = conn.cursor()
 
     cursor.execute("SELECT rank FROM teams WHERE division = ? AND team_name = ?", (division_type, team_name,))
-    rank_result = cursor.fetchone()[0]
+    rank_result = cursor.fetchone()
 
     conn.close()
-    return rank_result
+
+    if rank_result:
+        return rank_result[0]
+    else:
+        return None
 
 def check_team_division(team_name: str):
     """
@@ -112,6 +117,14 @@ def check_team_division(team_name: str):
     and returns the division type back
     in a string
     """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT division FROM teams WHERE team_name = ?", (team_name,))
+    result = cursor.fetchone()[0]
+
+    conn.close()
+    return result
 
 def db_register_team(division_type: str, team_name: str, members: str):
     """
