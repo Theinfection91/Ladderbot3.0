@@ -66,7 +66,15 @@ class Ladderbot(commands.Cog):
         since team names are set to be unique across
         all divisions (Cant have a Team Alpha in 1v1 and Team Alpha in 2v2)
         """
-        result_message = self.ladder_manager.challenge(challenger_team, challenged_team)
+        result_message = self.ladder_manager.challenge(ctx, challenger_team, challenged_team)
+        await ctx.send(result_message)
+
+    @commands.command()
+    async def cancel_challenge(self, ctx, challenger_team):
+        """
+        Will cancel the challenge of a given challenger team
+        """
+        result_message = self.ladder_manager.cancel_challenge(ctx, challenger_team)
         await ctx.send(result_message)
 
 # Define bot prefix and intents

@@ -1,6 +1,7 @@
 # Import the different divisions here
 
-from database import initialize_database, db_register_team, db_remove_team, is_team_name_unique, is_member_registered, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, give_team_rank, db_register_challenge
+import discord
+from database import initialize_database, db_register_team, db_remove_team, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, give_team_rank, db_register_challenge, db_remove_challenge
 from utils import is_correct_member_size, create_members_string
 
 class LadderManager:
@@ -85,7 +86,7 @@ class LadderManager:
         else:
             return f"No team named Team {team_name} found for the {division_type} division. Please try again."
         
-    def challenge(self, challenger_team, challenged_team):
+    def challenge(self, ctx, challenger_team, challenged_team):
         """
         Checks if teams exist, checks what division
         type the teams are in, checks if either team
@@ -93,12 +94,19 @@ class LadderManager:
         challenger team is one or two ranks below the
         challenged team,
         """
+        # Capture the author of the command call's display name
+        display_name = ctx.author.display_name
+
+        # Check if the person calling the command is apart of the challenger team
+        if not is_member_on_team(display_name, challenger_team):
+            return f"You are not a member of Team {challenger_team} and may not issue a challenge on their behalf."
+        
         # Check if both teams exist
         if not does_team_exist(challenger_team):
-            return f"No team found by the name of {challenger_team}."
+            return f"No team found by the name of {challenger_team}. Please try again."
         
         if not does_team_exist(challenged_team):
-            return f"No team found by the name of {challenged_team}."
+            return f"No team found by the name of {challenged_team}. Please try again."
         
         # Check if both teams exist within the same division and stores which divison if so
         challenger_division = check_team_division(challenger_team)
@@ -110,23 +118,55 @@ class LadderManager:
         # Set division type to use for helper functions
         division_type = challenger_division
         
-        print(division_type)
-        print("Passed exist and division check")
-        
-        # Check if the challenging team is challenging either one or two ranks above them
+        # Grab the rank of each team for comparison
         challenger_rank = give_team_rank(division_type, challenger_team)
         challenged_rank = give_team_rank(division_type, challenged_team)
-        
+
+        # Check if the challenging team is challenging either one or two ranks above them
         if challenged_rank > challenger_rank or challenged_rank <= challenger_rank - 3:
             return f"Teams can only challenge other teams up to two ranks above their current rank."
         
         # Check if either team has challenged or already been challenged
         if is_team_challenged(division_type, challenged_team):
             return f"{challenged_team} has already been challenged by another team and must complete that match first!"
+        if has_team_challenged(division_type, challenged_team):
+            return f"{challenged_team} has already sent out a challenge to a team and must complete that match first!"
+        
+        if is_team_challenged(division_type, challenger_team):
+            return f"{challenger_team} has already been challenged by another team and must complete that match first!"
         if has_team_challenged(division_type, challenger_team):
             return f"{challenger_team} has already sent out a challenge to a team and must complete that match first!"
         
         # Once all checks are passed then register the challenge in the correct table
         db_register_challenge(division_type, challenger_team, challenged_team)
-        print("registered challenge")
         return f"Team {challenger_team} has challenged Team {challenged_team} in the {division_type} division!"
+    
+    def cancel_challenge(self, ctx, challenger_team):
+        """
+        Method used by everyone to cancel a challenge
+        sent by mistake or for whatever reason. Since the match ID
+        is the challenger team, the only parameter needed will be
+        the nane of the challenger team. This method will check
+        if the team exists, if the person calling the command
+        is apart of the challenger team, and if there actually is
+        a challenge sent out by the team. If there is, it is deleted.
+        """
+        # Check if given team exists in the database
+        if not does_team_exist(challenger_team):
+            return f"No Team found by the name of {challenger_team}. Please try again."
+        
+        # Capture the author of the command call's display name and team division
+        display_name = ctx.author.display_name
+        team_division = check_team_division(challenger_team)
+        
+        # Check if the person calling the command is apart of the challenger team
+        if not is_member_on_team(display_name, challenger_team):
+            return f"You are not a member of Team {challenger_team}."
+
+        # Check if the given team has sent out a challenge
+        if not has_team_challenged(team_division, challenger_team):
+            return f"No challenge was found where Team {challenger_team} was the Challenger. Please try again."
+        
+        # If all checks are passed, delete the specified challenge from correct challenges table
+        db_remove_challenge(team_division, challenger_team)
+        return f"The challenge made by Team {challenger_team} in the {team_division} division has been canceled by a team member."

@@ -93,6 +93,36 @@ def is_member_registered(division_type: str, member_name: str):
     # If no match found, return False
     return False
 
+def is_member_on_team(display_name: str, team_name: str):
+    """
+    Checks if a person is apart of a certain team
+    Will be used for author purposes of command calls
+    to make sure people are making changes to their own
+    teams and cant cancel challenges or make challenges for
+    a team that they are not on.
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT members FROM teams WHERE team_name = ?", (team_name,))
+    results = cursor.fetchall()
+    
+    conn.close()
+
+    # Iterate over each member in the members strings results
+    for result in results:
+        members_string = result[0]
+
+    # Split string into list for names and strip white space
+        members_list = [member.strip() for member in members_string.split(",")]
+
+        if display_name in members_list:
+            return True
+    
+    # If display name is not found in members_list, return False
+    return False
+
+
 def give_team_rank(division_type: str, team_name: str):
     """
     Returns the rank of a given team in a given division type.

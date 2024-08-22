@@ -100,3 +100,33 @@ def db_register_challenge(division_type: str, challenger_team: str, challenged_t
         
         conn.commit()
         conn.close()
+
+def db_remove_challenge(division_type: str, challenger_team: str):
+    """
+    Removes a challenge some specific team
+    in a specific division
+    """
+
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    # If division type is 1v1
+    if division_type == '1v1':
+        cursor.execute("DELETE FROM challenges_1v1 WHERE match_id = ?", (challenger_team,))
+
+        conn.commit()
+        conn.close()
+    
+    # If division type is 2v2
+    if division_type == '2v2':
+        cursor.execute("DELETE FROM challenges_2v2 WHERE match_id = ?", (challenger_team,))
+
+        conn.commit()
+        conn.close()
+
+    # If division type is 3v3
+    if division_type == '3v3':
+        cursor.execute("DELETE FROM challenges_3v3 WHERE match_id = ?", (challenger_team,))
+
+        conn.commit()
+        conn.close()
