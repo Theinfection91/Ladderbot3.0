@@ -105,27 +105,27 @@ class LadderManager:
         challenged_division = check_team_division(challenged_team)
         
         if challenger_division != challenged_division:
-            return f"The teams are not in the same division."
+            return f"Team {challenger_team} and Team {challenged_team} are not in the same division..."
         
+        # Set division type to use for helper functions
         division_type = challenger_division
+        
         print(division_type)
         print("Passed exist and division check")
-        # Check if the challenging team is challenging either one or two ranks above them
         
-        """challenger_rank = give_team_rank(challenger_team)
-        challenged_rank = give_team_rank(challenged_team)
-        print("Grabbed teams ranks")
+        # Check if the challenging team is challenging either one or two ranks above them
+        challenger_rank = give_team_rank(division_type, challenger_team)
+        challenged_rank = give_team_rank(division_type, challenged_team)
+        
         if challenged_rank > challenger_rank or challenged_rank <= challenger_rank - 3:
             return f"Teams can only challenge other teams up to two ranks above their current rank."
-        print("Teams can challenge based on ranks")
-        # Check if either team has challenged or already been challenged"""
         
+        # Check if either team has challenged or already been challenged
         if is_team_challenged(division_type, challenged_team):
             return f"{challenged_team} has already been challenged by another team and must complete that match first!"
-        print("team can be challenged")
         if has_team_challenged(division_type, challenger_team):
             return f"{challenger_team} has already sent out a challenge to a team and must complete that match first!"
-        print("challenger can challenge")
+        
         # Once all checks are passed then register the challenge in the correct table
         db_register_challenge(division_type, challenger_team, challenged_team)
         print("registered challenge")

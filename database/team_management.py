@@ -103,13 +103,11 @@ def give_team_rank(division_type: str, team_name: str):
 
     cursor.execute("SELECT rank FROM teams WHERE division = ? AND team_name = ?", (division_type, team_name,))
     rank_result = cursor.fetchone()
-
+    
     conn.close()
-
-    if rank_result:
-        return rank_result[0]
-    else:
-        return None
+    
+    # If the team is found, return the rank (first element of the tuple)
+    return rank_result[0] if rank_result else None
 
 def check_team_division(team_name: str):
     """
