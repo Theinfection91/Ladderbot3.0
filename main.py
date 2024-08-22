@@ -40,7 +40,7 @@ class Ladderbot(commands.Cog):
     
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def remove_team(self, ctx, team_name, division_type):
+    async def remove_team(self, ctx, team_name: str, division_type: str):
         """
         Removes a team within a specifed division
 
@@ -59,7 +59,7 @@ class Ladderbot(commands.Cog):
         await ctx.send(result_message)
 
     @commands.command()
-    async def challenge(self, ctx, challenger_team, challenged_team):
+    async def challenge(self, ctx, challenger_team: str, challenged_team: str):
         """
         This challenge function will be usable by everyone
         and users will not need to specify which division
@@ -70,11 +70,31 @@ class Ladderbot(commands.Cog):
         await ctx.send(result_message)
 
     @commands.command()
-    async def cancel_challenge(self, ctx, challenger_team):
+    async def cancel_challenge(self, ctx, challenger_team: str):
         """
         Will cancel the challenge of a given challenger team
         """
         result_message = self.ladder_manager.cancel_challenge(ctx, challenger_team)
+        await ctx.send(result_message)
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def admin_challenge(self, ctx, challenger_team: str, challenged_team: str):
+        """
+        Admin method for manually creating challenges
+        between teams
+        """
+        result_message = self.ladder_manager.admin_challenge(challenger_team, challenged_team)
+        await ctx.send(result_message)
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def admin_cancel_challenge(self, ctx, challenger_team: str):
+        """
+        Admin method for manually cancelling challenges
+        between teams
+        """
+        result_message = self.ladder_manager.admin_cancel_challenge(challenger_team)
         await ctx.send(result_message)
 
 # Define bot prefix and intents
