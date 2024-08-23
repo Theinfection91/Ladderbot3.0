@@ -4,6 +4,38 @@ from config import LADDERBOT_DB
 def connect_db():
     return sqlite3.connect(LADDERBOT_DB)
 
+def find_opponent_team(division_type: str, opponent_team: str):
+    """
+    Finds who a team is facing in a match within
+    the given division type
+    """
+
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    # Variable to hold correct challenges location
+    table_name = f'challenges_{division_type}'
+
+    # Query to find the opponent
+    cursor.execute(f'''
+    SELECT challenger, challenged
+    FROM {table_name}
+    WHERE challenger = ? OR challenged = ?
+    ''', (opponent_team, opponent_team))
+
+    match = cursor.fetchone()
+
+    conn.close()
+
+    if match:
+        # Determine the opponent team based on which team is the given team
+        if match[0] == opponent_team:
+            return match[1]  # Opponent team is in the "challenged" column
+        else:
+            return match[0]  # Opponent team is in the "challenger" column
+    else:
+        return None
+
 def is_team_challenged(division_type: str, team_name: str):
     """
     Searches the database all division types
@@ -130,3 +162,20 @@ def db_remove_challenge(division_type: str, challenger_team: str):
 
         conn.commit()
         conn.close()
+
+def remove_challenge(division_type: str, team_name: str):
+    """
+    Removes a challenge for a specific team.
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+    
+    if division_type == '1v1':
+        cursor.execute("DELETE FROM challenges_1v1 WHERE challenger = ? OR challenged = ?", (team_name, team_name))
+    elif division_type == '2v2':
+        cursor.execute("DELETE FROM challenges_2v2 WHERE challenger = ? OR challenged = ?", (team_name, team_name))
+    elif division_type == '3v3':
+        cursor.execute("DELETE FROM challenges_3v3 WHERE challenger = ? OR challenged = ?", (team_name, team_name))
+    
+    conn.commit()
+    conn.close()

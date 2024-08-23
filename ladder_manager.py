@@ -1,7 +1,7 @@
 # Import the different divisions here
 
 import discord
-from database import initialize_database, db_register_team, db_remove_team, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, give_team_rank, db_register_challenge, db_remove_challenge
+from database import initialize_database, db_register_team, db_remove_team, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, update_team_wins_losses, update_team_rank, increment_rank_for_teams_below, remove_challenge
 from utils import is_correct_member_size, create_members_string
 
 class LadderManager:
@@ -27,6 +27,14 @@ class LadderManager:
         #Init the ladderbot.db when the LadderManager is instantiated
         initialize_database()
 
+    def create_1v1_test_teams(self):
+        db_register_team('1v1', "Alpha", "Theinfection1991")
+        db_register_team('1v1', "Bravo", "Theinfection1991")
+        db_register_team('1v1', "Charlie", "Theinfection1991")
+        db_register_team('1v1', "Delta", "Theinfection1991")
+        db_register_team('1v1', "Echo", "Theinfection1991")
+        return f"Created five 1v1 test teams"
+    
     def register_team(self, division_type: str, team_name: str, *members):
         """
         Takes the input from the discord user and
@@ -215,7 +223,7 @@ class LadderManager:
         
         # Once all checks are passed then register the challenge in the correct table
         db_register_challenge(division_type, challenger_team, challenged_team)
-        return f"Team {challenger_team} has challenged Team {challenged_team} in the {division_type} division!"
+        return f"Team {challenger_team} has challenged Team {challenged_team} in the {division_type} division! -This challenge was created by an Administrator."
     
     def admin_cancel_challenge(self, challenger_team: str):
         """
@@ -237,3 +245,44 @@ class LadderManager:
         # If all checks are passed, delete the specified challenge from correct challenges table
         db_remove_challenge(team_division, challenger_team)
         return f"The challenge made by Team {challenger_team} in the {team_division} division has been canceled by an Administrator."
+    
+    def report_win(self, ctx, winning_team: str):
+        """
+        Checks if there is a challenge involving the team name given,
+        determines the losing team based on the winning team,
+        updates ranks and wins/losses accordingly,
+        and removes the challenge from the challenges table.
+        """
+        # Checks if given team exists
+        if not does_team_exist(winning_team):
+            return f"No team found by the name of {winning_team}. Please try again."
+        
+        # If team exists, grab its division type
+        division_type = check_team_division(winning_team)
+        
+        # Check if author of command call is on the winning team
+        display_name = ctx.author.display_name
+        if not is_member_on_team(display_name, winning_team):
+            return f"You are not a member of Team {winning_team}."
+        
+        # Check if the given team is the challenger
+        if has_team_challenged(division_type, winning_team):
+            # Find the opponent team to determine the loser
+            losing_team = find_opponent_team(division_type, winning_team)
+
+            # Get the current ranks for the teams
+            winning_team_rank = give_team_rank(division_type, winning_team)
+            losing_team_rank = give_team_rank(division_type, losing_team)
+            
+            # Update ranks when challenger wins
+            db_update_rankings(division_type, winning_team, losing_team)
+            remove_challenge(division_type, winning_team)
+            return f"Team {winning_team} has won the match and taken the rank of Team {losing_team}! Team {losing_team} moves down one in the ranks."
+        else:
+            # If the winning team was the challenged team, no rank change occurs
+            losing_team = find_opponent_team(division_type, winning_team)
+            update_team_wins_losses(division_type, winning_team, win=True)
+            update_team_wins_losses(division_type, losing_team, win=False)
+            remove_challenge(division_type, losing_team)
+            return f"Team {winning_team} has won the match against Team {losing_team}, but no rank changes occur since Team {winning_team} was the challenged team."
+

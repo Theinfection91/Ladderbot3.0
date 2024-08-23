@@ -96,6 +96,24 @@ class Ladderbot(commands.Cog):
         """
         result_message = self.ladder_manager.admin_cancel_challenge(challenger_team)
         await ctx.send(result_message)
+    
+    @commands.command()
+    async def report_win(self, ctx, winning_team):
+        """
+        Command for all users to report who won
+        their match between the challenger and challenged team.
+        """
+        result_message = self.ladder_manager.report_win(ctx, winning_team)
+        await ctx.send(result_message)
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def create_1v1_test_teams(self, ctx):
+        """
+        Create 5 test teams fast for debugging
+        """
+        result_message = self.ladder_manager.create_1v1_test_teams()
+        await ctx.send(result_message)
 
 # Define bot prefix and intents
 intents = discord.Intents.default()
