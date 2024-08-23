@@ -1,7 +1,7 @@
 # Import the different divisions here
 
 import discord
-from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, update_team_wins_losses, update_team_rank, increment_rank_for_teams_below, remove_challenge, is_ladder_running, set_ladder_running
+from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, update_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running
 from utils import is_correct_member_size, create_members_string
 
 class LadderManager:
@@ -26,12 +26,6 @@ class LadderManager:
         """
         #Init the ladderbot.db when the LadderManager is instantiated
         initialize_database()
-
-        # Create states for each ladder for if it is currently running or not
-        self.ladder_1v1_running = False
-        self.ladder_2v2_running = False
-        self.ladder_3v3_running = False
-
 
     def create_test_teams(self, division_type):
         
@@ -97,7 +91,9 @@ class LadderManager:
                 if is_correct_member_size(division_type, *members):
 
                     # NOTE: Uncomment triple quotes to check if member is already registered on division type team
-                    """# Create a list of all the members display names
+                    #-----------------------------------------------
+
+                    # Create a list of all the members display names
                     member_display_names = [member.display_name for member in members]
 
                     # Checks every members display name against the database
@@ -105,9 +101,9 @@ class LadderManager:
                         
                         # If a player is already registered on a team in a given division type the process is stopped
                         if is_member_registered(division_type, member_display_name):     
-                            member_registered = f"{member_display_name} is already registered on a team in the {division_type} division. Please try again."
-                            return member_registered"""
-                    # NOTE
+                            return f"{member_display_name} is already registered on a team in the {division_type} division. Please try again."
+                    
+                    # NOTE :----------------------------------------
                         
                     # Turn all members into a string for the database
                     members_string = create_members_string(*members)

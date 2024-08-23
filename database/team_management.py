@@ -139,39 +139,6 @@ def give_team_rank(division_type: str, team_name: str):
     # If the team is found, return the rank (first element of the tuple)
     return rank_result[0] if rank_result else None
 
-def update_team_rank(division_type: str, team_name: str, new_rank: int):
-    """
-    Updates the rank for a given team in the specified division.
-    """
-    conn = connect_db()
-    cursor = conn.cursor()
-    
-    cursor.execute(f'''
-    UPDATE teams
-    SET rank = ?
-    WHERE team_name = ? AND division = ?
-    ''', (new_rank, team_name, division_type))
-    
-    conn.commit()
-    conn.close()
-
-def increment_rank_for_teams_below(division_type: str, threshold_rank: int):
-    """
-    Increments the rank for teams below a certain rank in the given division.
-    """
-    conn = connect_db()
-    cursor = conn.cursor()
-    
-    # Increment ranks for teams ranked lower than the threshold
-    cursor.execute(f'''
-    UPDATE teams
-    SET rank = rank + 1
-    WHERE rank > ? AND division = ?
-    ''', (threshold_rank, division_type))
-    
-    conn.commit()
-    conn.close()
-
 def update_team_wins_losses(division_type: str, team_name: str, win: bool):
     """
     Updates wins or losses for a team.
