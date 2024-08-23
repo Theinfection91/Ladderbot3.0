@@ -131,19 +131,19 @@ class LadderManager:
         challenger team is one or two ranks below the
         challenged team,
         """
-        # Capture the author of the command call's display name
-        display_name = ctx.author.display_name
-
-        # Check if the person calling the command is apart of the challenger team
-        if not is_member_on_team(display_name, challenger_team):
-            return f"You are not a member of Team {challenger_team} and may not issue a challenge on their behalf."
-        
         # Check if both teams exist
         if not does_team_exist(challenger_team):
             return f"No team found by the name of {challenger_team}. Please try again."
         
         if not does_team_exist(challenged_team):
             return f"No team found by the name of {challenged_team}. Please try again."
+        
+        # Capture the author of the command call's display name
+        display_name = ctx.author.display_name
+
+        # Check if the person calling the command is apart of the challenger team
+        if not is_member_on_team(display_name, challenger_team):
+            return f"You are not a member of Team {challenger_team} and may not issue a challenge on their behalf."
         
         # Check if both teams exist within the same division and stores which divison if so
         challenger_division = check_team_division(challenger_team)
@@ -154,6 +154,10 @@ class LadderManager:
         
         # Set division type to use for helper functions
         division_type = challenger_division
+        
+        # Check if the ladder is running in the given division type
+        if not is_ladder_running(division_type):
+            return f"The {division_type} division of the ladder has not started yet... Please wait to send challenges."
         
         # Grab the rank of each team for comparison
         challenger_rank = give_team_rank(division_type, challenger_team)
@@ -230,6 +234,10 @@ class LadderManager:
         
         # Set division type to use for helper functions
         division_type = challenger_division
+
+        # Check if the ladder is running in the given division type
+        if not is_ladder_running(division_type):
+            return f"The {division_type} division of the ladder has not started yet... Please wait to send challenges."
         
         # Grab the rank of each team for comparison
         challenger_rank = give_team_rank(division_type, challenger_team)
@@ -288,6 +296,10 @@ class LadderManager:
         
         # If team exists, grab its division type
         division_type = check_team_division(winning_team)
+
+        # Check if the ladder is running in the given division type
+        if not is_ladder_running(division_type):
+            return f"The {division_type} division of the ladder has not started yet..."
         
         # Check if author of command call is on the winning team
         display_name = ctx.author.display_name
@@ -323,6 +335,10 @@ class LadderManager:
         
         # If team exists, grab its division type
         division_type = check_team_division(winning_team)
+
+        # Check if the ladder is running in the given division type
+        if not is_ladder_running(division_type):
+            return f"The {division_type} division of the ladder has not started yet..."
         
         # Check if the given team is the challenger
         if has_team_challenged(division_type, winning_team):
