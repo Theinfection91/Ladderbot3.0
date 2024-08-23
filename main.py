@@ -19,6 +19,26 @@ class Ladderbot(commands.Cog):
     
     @commands.command()
     @commands.has_permissions(administrator=True)
+    async def start_ladder(self, ctx, division_type: str):
+        """
+        Method for starting the ladder in
+        a given division type
+        """
+        result = self.ladder_manager.start_ladder(division_type)
+        await ctx.send(result)
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def end_ladder(self, ctx, division_type: str):
+        """
+        Method for ending the ladder in
+        a given division type
+        """
+        result = self.ladder_manager.end_ladder(division_type)
+        await ctx.send(result)
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
     async def register_team(self, ctx, team_name: str,  division_type: str, *members: discord.Member):
         """
         Registers a new team within a specified division.
