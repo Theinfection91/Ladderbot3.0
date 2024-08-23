@@ -108,11 +108,11 @@ class Ladderbot(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def create_1v1_test_teams(self, ctx):
+    async def create_test_teams(self, ctx, division_type):
         """
         Create 5 test teams fast for debugging
         """
-        result_message = self.ladder_manager.create_1v1_test_teams()
+        result_message = self.ladder_manager.create_test_teams(division_type)
         await ctx.send(result_message)
 
 # Define bot prefix and intents

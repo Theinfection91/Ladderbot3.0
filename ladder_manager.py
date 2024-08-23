@@ -27,13 +27,31 @@ class LadderManager:
         #Init the ladderbot.db when the LadderManager is instantiated
         initialize_database()
 
-    def create_1v1_test_teams(self):
-        db_register_team('1v1', "Alpha", "Theinfection1991")
-        db_register_team('1v1', "Bravo", "Theinfection1991")
-        db_register_team('1v1', "Charlie", "Theinfection1991")
-        db_register_team('1v1', "Delta", "Theinfection1991")
-        db_register_team('1v1', "Echo", "Theinfection1991")
-        return f"Created five 1v1 test teams"
+    def create_test_teams(self, division_type):
+        
+        if division_type == '1v1':
+            db_register_team('1v1', "Alpha", "Theinfection1991")
+            db_register_team('1v1', "Bravo", "Theinfection1991")
+            db_register_team('1v1', "Charlie", "Theinfection1991")
+            db_register_team('1v1', "Delta", "Theinfection1991")
+            db_register_team('1v1', "Echo", "Theinfection1991")
+            return f"Created five 1v1 test teams"
+        
+        if division_type == '2v2':
+            db_register_team('2v2', "Apple", "Theinfection1991")
+            db_register_team('2v2', "Butler", "Theinfection1991")
+            db_register_team('2v2', "Carlos", "Theinfection1991")
+            db_register_team('2v2', "Dynasty", "Theinfection1991")
+            db_register_team('2v2', "Ellen", "Theinfection1991")
+            return f"Created five 2v2 test teams"
+        
+        if division_type == '3v3':
+            db_register_team('3v3', "A", "Theinfection1991")
+            db_register_team('3v3', "B", "Theinfection1991")
+            db_register_team('3v3', "C", "Theinfection1991")
+            db_register_team('3v3', "D", "Theinfection1991")
+            db_register_team('3v3', "E", "Theinfection1991")
+            return f"Created five 3v3 test teams"
     
     def register_team(self, division_type: str, team_name: str, *members):
         """
@@ -269,10 +287,6 @@ class LadderManager:
         if has_team_challenged(division_type, winning_team):
             # Find the opponent team to determine the loser
             losing_team = find_opponent_team(division_type, winning_team)
-
-            # Get the current ranks for the teams
-            winning_team_rank = give_team_rank(division_type, winning_team)
-            losing_team_rank = give_team_rank(division_type, losing_team)
             
             # Update ranks when challenger wins
             db_update_rankings(division_type, winning_team, losing_team)
