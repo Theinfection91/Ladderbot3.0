@@ -88,18 +88,18 @@ class LadderManager:
                     # Add team to the database with the given arguments
                     db_register_team(division_type, team_name, members_string)
 
-                    # Create and return confirmation message
-                    register_team_success = f"Team {team_name} has been registered in the {division_type} division with the following members: {members_string}"
-                    return register_team_success
+                    # Return confirmation message
+                    return f"Team {team_name} has been registered in the {division_type} division with the following members: {members_string}"
+                
                 else:
-                    incorrect_member_count = "Please enter the correct amount of members depending on the division type."
-                    return incorrect_member_count
+                    return "Please enter the correct amount of members depending on the division type."
+                
             else:
-                incorrect_division = "Please enter 1v1 2v2 or 3v3 for the division type and try again."
-                return incorrect_division
+                return "Please enter 1v1 2v2 or 3v3 for the division type and try again."
+            
         else:
-            duplicate_team_name = f"Team {team_name} is already being used. Please choose another team name."
-            return duplicate_team_name
+            return f"Team {team_name} is already being used. Please choose another team name."
+        
         
     def remove_team(self, division_type, team_name):
         """
@@ -300,6 +300,36 @@ class LadderManager:
             remove_challenge(division_type, losing_team)
             return f"Team {winning_team} has won the match against Team {losing_team}, but no rank changes occur since Team {winning_team} was the challenged team."
     
+    def admin_report_win(self, winning_team: str):
+        """
+        Admin method for reporting wins between teams
+        Works just like report_win but doesnt check
+        if the author is part of winning_team
+        """
+        # Checks if given team exists
+        if not does_team_exist(winning_team):
+            return f"No team found by the name of {winning_team}. Please try again."
+        
+        # If team exists, grab its division type
+        division_type = check_team_division(winning_team)
+        
+        # Check if the given team is the challenger
+        if has_team_challenged(division_type, winning_team):
+            # Find the opponent team to determine the loser
+            losing_team = find_opponent_team(division_type, winning_team)
+            
+            # Update ranks when challenger wins
+            db_update_rankings(division_type, winning_team, losing_team)
+            remove_challenge(division_type, winning_team)
+            return f"Team {winning_team} has won the match and taken the rank of Team {losing_team}! Team {losing_team} moves down one in the ranks. This report was made by an Administrator."
+        else:
+            # If the winning team was the challenged team, no rank change occurs
+            losing_team = find_opponent_team(division_type, winning_team)
+            update_team_wins_losses(division_type, winning_team, win=True)
+            update_team_wins_losses(division_type, losing_team, win=False)
+            remove_challenge(division_type, losing_team)
+            return f"Team {winning_team} has won the match against Team {losing_team}, but no rank changes occur since Team {winning_team} was the challenged team. This report was made by an Administrator."
+
     def set_rank(self, team_name: str, new_rank: int):
         """
         Admin method for manually changing the rank

@@ -105,6 +105,16 @@ class Ladderbot(commands.Cog):
         """
         result_message = self.ladder_manager.report_win(ctx, winning_team)
         await ctx.send(result_message)
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def admin_report_win(self, ctx, winning_team):
+        """
+        Command for Admins only to report who won
+        a match, giving the winning team just like report_win
+        """
+        result_message = self.ladder_manager.admin_report_win(winning_team)
+        await ctx.send(result_message)
     
     @commands.command()
     @commands.has_permissions(administrator=True)
