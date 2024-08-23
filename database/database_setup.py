@@ -72,19 +72,31 @@ def create_tables(conn):
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS states (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    ladder_1v1_running TEXT NOT NULL,
-    ladder_2v2_running TEXT NOT NULL,
-    ladder_3v3_running TEXT NOT NULL,
-    challenges_1v1_channel INTEGER NOT NULL,
-    challenges_2v2_channel INTEGER NOT NULL,
-    challenges_3v3_channel INTEGER NOT NULL,   
-    standings_1v1_channel INTEGER NOT NULL,
-    standings_2v2_channel INTEGER NOT NULL,
-    standings_3v3_channel INTEGER NOT NULL            
+    division TEXT NOT NULL,
+    ladder_running BOOLEAN NOT NULL DEFAULT FALSE,
+    standings_channel_id INTEGER DEFAULT NULL,
+    challenges_channel_id INTEGER DEFAULT NULL           
 )
 ''')
     
-    # Add logic for other tables as needed
+    # Insert default division states and channel id's if not already present
+    cursor.execute('''
+    INSERT INTO states (division, ladder_running, standings_channel_id, challenges_channel_id)
+    SELECT * FROM (SELECT '1v1', FALSE, NULL, NULL) AS tmp
+    WHERE NOT EXISTS (
+        SELECT division FROM states WHERE division = '1v1'
+    )
+    UNION ALL
+    SELECT * FROM (SELECT '2v2', FALSE, NULL, NULL) AS tmp
+    WHERE NOT EXISTS (
+        SELECT division FROM states WHERE division = '2v2'
+    )
+    UNION ALL
+    SELECT * FROM (SELECT '3v3', FALSE, NULL, NULL) AS tmp
+    WHERE NOT EXISTS (
+        SELECT division FROM states WHERE division = '3v3'
+    );
+    ''')
 
     # Commit the changes
     conn.commit()
