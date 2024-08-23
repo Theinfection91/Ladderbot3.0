@@ -1,7 +1,7 @@
 # Import the different divisions here
 
 import discord
-from database import initialize_database, db_register_team, db_remove_team, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, update_team_wins_losses, update_team_rank, increment_rank_for_teams_below, remove_challenge
+from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, update_team_wins_losses, update_team_rank, increment_rank_for_teams_below, remove_challenge
 from utils import is_correct_member_size, create_members_string
 
 class LadderManager:
@@ -299,4 +299,33 @@ class LadderManager:
             update_team_wins_losses(division_type, losing_team, win=False)
             remove_challenge(division_type, losing_team)
             return f"Team {winning_team} has won the match against Team {losing_team}, but no rank changes occur since Team {winning_team} was the challenged team."
+    
+    def set_rank(self, team_name: str, new_rank: int):
+        """
+        Admin method for manually changing the rank
+        of a team
+        """
+        if not does_team_exist(team_name):
+            return f"No team found by the name of {team_name}. Please try again."
 
+        # If team exists, find division type
+        division_type = check_team_division(team_name)
+
+        # Find the teams current rank
+        current_rank = give_team_rank(division_type, team_name)
+
+        # Find the max rank
+        max_rank = count_teams(division_type)
+        
+        # Check if new rank is valid
+        if new_rank < 1 or new_rank > max_rank:
+            return f"Invalid rank. The rank should be between 1 and {max_rank}. Please try again."
+        
+        # Check if new rank being entered is the current rank of given team
+        elif new_rank == current_rank:
+            return f"{team_name} is already at rank {new_rank} in the {division_type} division. Please try again."
+        
+        else:
+            # Update the ranks if all conditions pass
+            db_set_rank(division_type, team_name, new_rank, current_rank)
+            return f"Team {team_name} has been assigned to the rank of {new_rank} in the {division_type} division."

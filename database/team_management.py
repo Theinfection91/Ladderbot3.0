@@ -166,7 +166,7 @@ def increment_rank_for_teams_below(division_type: str, threshold_rank: int):
     cursor.execute(f'''
     UPDATE teams
     SET rank = rank + 1
-    WHERE rank >= ? AND division = ?
+    WHERE rank > ? AND division = ?
     ''', (threshold_rank, division_type))
     
     conn.commit()
@@ -209,6 +209,36 @@ def check_team_division(team_name: str):
 
     conn.close()
     return result
+
+def db_set_rank(division_type: str, team_name: str, new_rank: int, current_rank: int):
+    """
+    Provides the logic for the set rank command
+    that will be used by Admins if they need
+    to manually change a teams rank
+    """
+
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    # Update the rank of the given team
+    cursor.execute(" UPDATE teams SET rank = ? WHERE division = ? AND team_name = ?",
+                   (new_rank, division_type, team_name))
+    
+    # Adjust the ranks of other teams in the division
+    if new_rank < current_rank:
+        # If the rank is moved up, push other teams down
+        cursor.execute("UPDATE teams SET rank = rank + 1 WHERE division = ? AND rank >= ? AND team_name != ?",
+                       (division_type, new_rank, team_name)
+                       )
+    elif new_rank > current_rank:
+        # If rank is moved down, pull other teams up
+        cursor.execute(
+            "UPDATE teams SET rank = rank - 1 WHERE division = ? AND rank <= ? AND team_name != ?",
+            (division_type, new_rank, team_name)
+        )
+    
+    conn.commit()
+    conn.close()
 
 def db_update_rankings(division_type: str, winning_team: str, losing_team: str):
     """

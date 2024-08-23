@@ -105,6 +105,17 @@ class Ladderbot(commands.Cog):
         """
         result_message = self.ladder_manager.report_win(ctx, winning_team)
         await ctx.send(result_message)
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def set_rank(self, ctx, team_name: str, new_rank: int):
+        """
+        Admin method for manually changing
+        the rank a given team and adjusting
+        the other teams ranks accordingly.
+        """
+        result_message = self.ladder_manager.set_rank(team_name, new_rank)
+        await ctx.send(result_message)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
