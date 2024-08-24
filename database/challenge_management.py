@@ -92,6 +92,26 @@ def has_team_challenged(division_type: str, team_name: str):
         conn.close()
         return count > 0
 
+def get_challenges_data(division_type: str):
+    """
+    Used to grab challenges data for
+    division type to then format for
+    post_challenges method
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    # Pick correct challenges table
+    table_name = f"challenges_{division_type}"
+
+    # Fetch the current challenges for division type
+    cursor.execute(f"SELECT challenger, challenged FROM {table_name} ORDER BY id ASC")
+    challenges = cursor.fetchall()
+    conn.close()
+
+    # Return raw data to be used in helper function to format neatly
+    return challenges
+
 def db_register_challenge(division_type: str, challenger_team: str, challenged_team: str):
     """
     INSERT's given data into the correct division table and also

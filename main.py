@@ -189,11 +189,33 @@ class Ladderbot(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def create_test_teams(self, ctx, division_type):
+    async def create_test_teams(self, ctx, division_type: str):
         """
         Create 5 test teams fast for debugging
         """
         result = self.ladder_manager.create_test_teams(division_type)
+        await ctx.send(result)
+    
+    @commands.command()
+    async def post_standings(self, ctx, division_type: str):
+        """
+        Command usable by all users to
+        post the current standings of a given
+        division type into the channel this
+        was called from.
+        """
+        result = self.ladder_manager.post_standings(division_type)
+        await ctx.send(result)
+
+    @commands.command()
+    async def post_challenges(self, ctx, division_type: str):
+        """
+        Command for everyone to post
+        the current challenges for a given 
+        division type into the channel
+        this was called from.
+        """
+        result = self.ladder_manager.post_challenges(division_type)
         await ctx.send(result)
 
 # Define bot prefix and intents

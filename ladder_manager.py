@@ -1,8 +1,8 @@
 # Import the different divisions here
 
 import discord
-from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses
-from utils import is_correct_member_size, create_members_string
+from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data
+from utils import is_correct_member_size, create_members_string, format_standings_data, format_challenges_data
 
 class LadderManager:
     """
@@ -472,3 +472,32 @@ class LadderManager:
         if current_losses >= 1:
             subtract_team_wins_losses(division_type, team_name, False)
             return f"Team {team_name} has had a loss taken away by an Administrator. They now have {current_losses - 1} losses."
+        
+    def post_standings(self, division_type: str):
+        """
+        Method for everyone to post the current
+        standings of a given division type into
+        the channel this was called from
+        """
+        # Get standings data from database for given division type
+        raw_standings_data = get_standings_data(division_type)
+
+        # Format the raw standings data into something pretty
+        formatted_standings_data = format_standings_data(division_type, raw_standings_data)
+
+        return formatted_standings_data
+
+    def post_challenges(self, division_type: str):
+        """
+        Method for everyone to post the current
+        challenges of a given division type into
+        the channel this was called from
+        """
+        # Get challenges data from database for given division type
+        raw_challenges_data = get_challenges_data(division_type)
+
+        # Format the raw standings data
+        formatted_challenges_data = format_challenges_data(division_type ,raw_challenges_data)
+
+        return formatted_challenges_data
+

@@ -219,6 +219,29 @@ def check_team_division(team_name: str):
     conn.close()
     return result
 
+def get_standings_data(division_type: str):
+    """
+    Used to grab data to format
+    to a string for the post_standings method
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    # Fetch team data
+    cursor.execute("""
+        SELECT team_name, rank, wins, losses 
+        FROM teams 
+        WHERE division = ? 
+        ORDER BY rank
+    """, (division_type,))
+
+    # Store data in teams
+    teams = cursor.fetchall()
+    conn.close()
+
+    # Return teams to be used in helper function to format neatly
+    return teams
+
 def db_set_rank(division_type: str, team_name: str, new_rank: int, current_rank: int):
     """
     Provides the logic for the set rank command
