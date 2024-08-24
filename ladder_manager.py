@@ -1,7 +1,7 @@
 # Import the different divisions here
 
 import discord
-from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, update_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running
+from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses
 from utils import is_correct_member_size, create_members_string
 
 class LadderManager:
@@ -73,7 +73,6 @@ class LadderManager:
         set_ladder_running(division_type, False)
         return f"The {division_type} division of the ladder has ended!"
 
-    
     def register_team(self, division_type: str, team_name: str, *members):
         """
         Takes the input from the discord user and
@@ -330,8 +329,8 @@ class LadderManager:
         else:
             # If the winning team was the challenged team, no rank change occurs
             losing_team = find_opponent_team(division_type, winning_team)
-            update_team_wins_losses(division_type, winning_team, win=True)
-            update_team_wins_losses(division_type, losing_team, win=False)
+            add_team_wins_losses(division_type, winning_team, win=True)
+            add_team_wins_losses(division_type, losing_team, win=False)
             remove_challenge(division_type, losing_team)
             return f"Team {winning_team} has won the match against Team {losing_team}, but no rank changes occur since Team {winning_team} was the challenged team."
     
@@ -364,8 +363,8 @@ class LadderManager:
         else:
             # If the winning team was the challenged team, no rank change occurs
             losing_team = find_opponent_team(division_type, winning_team)
-            update_team_wins_losses(division_type, winning_team, win=True)
-            update_team_wins_losses(division_type, losing_team, win=False)
+            add_team_wins_losses(division_type, winning_team, win=True)
+            add_team_wins_losses(division_type, losing_team, win=False)
             remove_challenge(division_type, losing_team)
             return f"Team {winning_team} has won the match against Team {losing_team}, but no rank changes occur since Team {winning_team} was the challenged team. This report was made by an Administrator."
 
@@ -398,3 +397,75 @@ class LadderManager:
             # Update the ranks if all conditions pass
             db_set_rank(division_type, team_name, new_rank, current_rank)
             return f"Team {team_name} has been assigned to the rank of {new_rank} in the {division_type} division."
+    
+    def add_win(self, team_name: str):
+        """
+        Admin method to manually increment ONE
+        win to a given team
+        """
+        if not does_team_exist(team_name):
+            return f"No team found by the name of {team_name}. Please try again."
+        
+        # Grab division type if team is found
+        division_type = check_team_division(team_name)
+
+        # Add win to team
+        add_team_wins_losses(division_type, team_name, True)
+        return f"Team {team_name} has been given a win by an Administrator."
+
+    def subtract_win(self, team_name: str):
+        """
+        Admin method to manually decrement ONE
+        win to a given team
+        """
+        if not does_team_exist(team_name):
+            return f"No team found by the name of {team_name}. Please try again."
+        
+        # Grab division type if team is found
+        division_type = check_team_division(team_name)
+        
+        # Grab team's current amount of wins
+        current_wins = get_wins_or_losses(team_name, True)
+
+        if current_wins < 1:
+            return f"Team {team_name} does not have any wins to take away." 
+        
+        if current_wins >= 1:
+            subtract_team_wins_losses(division_type, team_name, True)
+            return f"Team {team_name} has had a win taken away by an Administrator. They now have {current_wins - 1} wins."
+    
+    def add_loss(self, team_name: str):
+        """
+        Admin method to manually increment ONE
+        loss to a given team
+        """
+        if not does_team_exist(team_name):
+            return f"No team found by the name of {team_name}. Please try again."
+        
+        # Grab division type if team is found
+        division_type = check_team_division(team_name)
+
+        # Add loss to the team
+        add_team_wins_losses(division_type, team_name, False)
+        return f"Team {team_name} has been given a loss by an Administrator"
+    
+    def subtract_loss(self, team_name: str):
+        """
+        Admin method to manually decrement ONE
+        loss to a given team
+        """
+        if not does_team_exist(team_name):
+            return f"No team found by the name of {team_name}. Please try again."
+
+        # Grab division type if team is found
+        division_type = check_team_division(team_name)
+
+        # Grab team's current amount of losses
+        current_losses = get_wins_or_losses(team_name, False)
+
+        if current_losses < 1:
+            return f"Team {team_name} does not have any losses to take away."
+        
+        if current_losses >= 1:
+            subtract_team_wins_losses(division_type, team_name, False)
+            return f"Team {team_name} has had a loss taken away by an Administrator. They now have {current_losses - 1} losses."

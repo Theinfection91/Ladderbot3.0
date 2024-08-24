@@ -55,8 +55,8 @@ class Ladderbot(commands.Cog):
         Output:
             Team Alpha has been registered in the 2v2 division with the following members: Ixnay, Flaw
         """
-        result_message = self.ladder_manager.register_team(division_type, team_name, *members)
-        await ctx.send(result_message)
+        result = self.ladder_manager.register_team(division_type, team_name, *members)
+        await ctx.send(result)
     
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -75,8 +75,8 @@ class Ladderbot(commands.Cog):
         Output:
             Team Delta from the 1v1 division has been removed from the Ladder.
         """
-        result_message = self.ladder_manager.remove_team(division_type, team_name)
-        await ctx.send(result_message)
+        result = self.ladder_manager.remove_team(division_type, team_name)
+        await ctx.send(result)
 
     @commands.command()
     async def challenge(self, ctx, challenger_team: str, challenged_team: str):
@@ -86,16 +86,16 @@ class Ladderbot(commands.Cog):
         since team names are set to be unique across
         all divisions (Cant have a Team Alpha in 1v1 and Team Alpha in 2v2)
         """
-        result_message = self.ladder_manager.challenge(ctx, challenger_team, challenged_team)
-        await ctx.send(result_message)
+        result = self.ladder_manager.challenge(ctx, challenger_team, challenged_team)
+        await ctx.send(result)
 
     @commands.command()
     async def cancel_challenge(self, ctx, challenger_team: str):
         """
         Will cancel the challenge of a given challenger team
         """
-        result_message = self.ladder_manager.cancel_challenge(ctx, challenger_team)
-        await ctx.send(result_message)
+        result = self.ladder_manager.cancel_challenge(ctx, challenger_team)
+        await ctx.send(result)
     
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -104,8 +104,8 @@ class Ladderbot(commands.Cog):
         Admin method for manually creating challenges
         between teams
         """
-        result_message = self.ladder_manager.admin_challenge(challenger_team, challenged_team)
-        await ctx.send(result_message)
+        result = self.ladder_manager.admin_challenge(challenger_team, challenged_team)
+        await ctx.send(result)
     
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -114,8 +114,8 @@ class Ladderbot(commands.Cog):
         Admin method for manually cancelling challenges
         between teams
         """
-        result_message = self.ladder_manager.admin_cancel_challenge(challenger_team)
-        await ctx.send(result_message)
+        result = self.ladder_manager.admin_cancel_challenge(challenger_team)
+        await ctx.send(result)
     
     @commands.command()
     async def report_win(self, ctx, winning_team):
@@ -123,8 +123,8 @@ class Ladderbot(commands.Cog):
         Command for all users to report who won
         their match between the challenger and challenged team.
         """
-        result_message = self.ladder_manager.report_win(ctx, winning_team)
-        await ctx.send(result_message)
+        result = self.ladder_manager.report_win(ctx, winning_team)
+        await ctx.send(result)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -133,8 +133,8 @@ class Ladderbot(commands.Cog):
         Command for Admins only to report who won
         a match, giving the winning team just like report_win
         """
-        result_message = self.ladder_manager.admin_report_win(winning_team)
-        await ctx.send(result_message)
+        result = self.ladder_manager.admin_report_win(winning_team)
+        await ctx.send(result)
     
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -144,8 +144,28 @@ class Ladderbot(commands.Cog):
         the rank a given team and adjusting
         the other teams ranks accordingly.
         """
-        result_message = self.ladder_manager.set_rank(team_name, new_rank)
-        await ctx.send(result_message)
+        result = self.ladder_manager.set_rank(team_name, new_rank)
+        await ctx.send(result)
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def add_win(self, ctx, team_name: str):
+        """
+        Admin method to manually increment
+        ONE win to the given team
+        """
+        result = self.ladder_manager.add_win(team_name)
+        await ctx.send(result)
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def subtract_win(self, ctx, team_name: str):
+        """
+        Admin method to manually decrement
+        ONE win to the given team
+        """
+        result = self.ladder_manager.subtract_win(team_name)
+        await ctx.send(result)
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -153,8 +173,8 @@ class Ladderbot(commands.Cog):
         """
         Create 5 test teams fast for debugging
         """
-        result_message = self.ladder_manager.create_test_teams(division_type)
-        await ctx.send(result_message)
+        result = self.ladder_manager.create_test_teams(division_type)
+        await ctx.send(result)
 
 # Define bot prefix and intents
 intents = discord.Intents.default()

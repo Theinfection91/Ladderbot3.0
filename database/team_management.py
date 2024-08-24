@@ -139,7 +139,7 @@ def give_team_rank(division_type: str, team_name: str):
     # If the team is found, return the rank (first element of the tuple)
     return rank_result[0] if rank_result else None
 
-def update_team_wins_losses(division_type: str, team_name: str, win: bool):
+def add_team_wins_losses(division_type: str, team_name: str, win: bool):
     """
     Updates wins or losses for a team.
     """
@@ -161,6 +161,48 @@ def update_team_wins_losses(division_type: str, team_name: str, win: bool):
     
     conn.commit()
     conn.close()
+
+def subtract_team_wins_losses(division_type: str, team_name: str, win_or_loss: bool):
+    """
+    Subtract a win with True
+    Subtract a loss with False
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    if win_or_loss:
+        cursor.execute(f"UPDATE teams SET wins = wins - 1 WHERE team_name = ? AND division = ?", (team_name, division_type))
+    
+    else:
+        cursor.execute(f"UPDATE teams SET losses = losses - 1 WHERE team_name = ? AND division = ?", (team_name, division_type))
+    
+    conn.commit()
+    conn.close()
+
+def get_wins_or_losses(team_name: str, wins_or_losses: bool):
+    """
+    True to grab int value of wins
+    False to grab int value of losses
+
+    Used for the admin method to subtract wins
+    and losses so the team will not have a negative
+    amount if used incorrectly
+    """
+    
+    conn = connect_db()
+    cursor = conn.cursor()
+    
+    # If True
+    if wins_or_losses:
+        cursor.execute("SELECT wins FROM teams WHERE team_name = ?", (team_name,))
+        result = cursor.fetchone()[0]
+    # If False
+    else:
+        cursor.execute("SELECT losses FROM teams WHERE team_name = ?", (team_name,))
+        result = cursor.fetchone()[0]
+    
+    conn.close()
+    return result
 
 def check_team_division(team_name: str):
     """
