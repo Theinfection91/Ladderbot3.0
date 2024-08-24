@@ -1,7 +1,7 @@
 # Import the different divisions here
 
 import discord
-from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data
+from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel
 from utils import is_correct_member_size, create_members_string, format_standings_data, format_challenges_data
 
 class LadderManager:
@@ -53,6 +53,19 @@ class LadderManager:
             db_register_team('3v3', "E", "Theinfection1991")
             return f"Created five 3v3 test teams"
     
+    def on_ready(self, bot):
+        """
+        Logic for on_ready listener for when
+        the bot starts up
+        """
+        print(f"Logged in as {bot.user}")
+
+        divisions = ['1v1', '2v2', '3v3']
+
+        for division in divisions:
+            if is_ladder_running(division):
+                print(f"The {division} division of the ladder is currently running.")
+    
     def start_ladder(self, division_type):
         """
         
@@ -61,7 +74,7 @@ class LadderManager:
             return f"The {division_type} division of the ladder is already running..."
         
         set_ladder_running(division_type, True)
-        return f"The {division_type} division of the ladder has started!"
+        return f"🔥 The {division_type} division of the ladder has started! 🔥"
     
     def end_ladder(self, division_type):
         """
@@ -71,7 +84,7 @@ class LadderManager:
             return f"The {division_type} division of the ladder is not currently running..."
         
         set_ladder_running(division_type, False)
-        return f"The {division_type} division of the ladder has ended!"
+        return f"💥 The {division_type} division of the ladder has ended! 💥"
 
     def register_team(self, division_type: str, team_name: str, *members):
         """
@@ -111,7 +124,7 @@ class LadderManager:
                     db_register_team(division_type, team_name, members_string)
 
                     # Return confirmation message
-                    return f"Team {team_name} has been registered in the {division_type} division with the following members: {members_string}"
+                    return f"🎖️ Team {team_name} has been registered in the {division_type} division with the following members: {members_string} 🎖️"
                 
                 else:
                     return "Please enter the correct amount of members depending on the division type."
@@ -194,7 +207,7 @@ class LadderManager:
         
         # Once all checks are passed then register the challenge in the correct table
         db_register_challenge(division_type, challenger_team, challenged_team)
-        return f"Team {challenger_team} has challenged Team {challenged_team} in the {division_type} division!"
+        return f"⚔️ Team {challenger_team} has challenged Team {challenged_team} in the {division_type} division! ⚔️"
     
     def cancel_challenge(self, ctx, challenger_team: str):
         """
@@ -224,7 +237,7 @@ class LadderManager:
         
         # If all checks are passed, delete the specified challenge from correct challenges table
         db_remove_challenge(team_division, challenger_team)
-        return f"The challenge made by Team {challenger_team} in the {team_division} division has been canceled by a team member."
+        return f"🚩 The challenge made by Team {challenger_team} in the {team_division} division has been canceled by a team member. 🚩"
     
     def admin_challenge(self, challenger_team: str, challenged_team: str):
         """
@@ -274,7 +287,7 @@ class LadderManager:
         
         # Once all checks are passed then register the challenge in the correct table
         db_register_challenge(division_type, challenger_team, challenged_team)
-        return f"Team {challenger_team} has challenged Team {challenged_team} in the {division_type} division! -This challenge was created by an Administrator."
+        return f"⚔️ Team {challenger_team} has challenged Team {challenged_team} in the {division_type} division! ⚔️ -This challenge was created by an Administrator."
     
     def admin_cancel_challenge(self, challenger_team: str):
         """
@@ -295,7 +308,7 @@ class LadderManager:
         
         # If all checks are passed, delete the specified challenge from correct challenges table
         db_remove_challenge(team_division, challenger_team)
-        return f"The challenge made by Team {challenger_team} in the {team_division} division has been canceled by an Administrator."
+        return f"🚩 The challenge made by Team {challenger_team} in the {team_division} division has been canceled by an Administrator. 🚩"
     
     def report_win(self, ctx, winning_team: str):
         """
@@ -328,14 +341,14 @@ class LadderManager:
             # Update ranks when challenger wins
             db_update_rankings(division_type, winning_team, losing_team)
             remove_challenge(division_type, winning_team)
-            return f"Team {winning_team} has won the match and taken the rank of Team {losing_team}! Team {losing_team} moves down one in the ranks."
+            return f"🏆 Team {winning_team} has won the match and taken the rank of Team {losing_team}! Team {losing_team} moves down one in the ranks. 🏆"
         else:
             # If the winning team was the challenged team, no rank change occurs
             losing_team = find_opponent_team(division_type, winning_team)
             add_team_wins_losses(division_type, winning_team, win=True)
             add_team_wins_losses(division_type, losing_team, win=False)
             remove_challenge(division_type, losing_team)
-            return f"Team {winning_team} has won the match against Team {losing_team}, but no rank changes occur since Team {winning_team} was the challenged team."
+            return f"🏆 Team {winning_team} has won the match against Team {losing_team}, but no rank changes occur since Team {winning_team} was the challenged team. 🏆"
     
     def admin_report_win(self, winning_team: str):
         """
@@ -362,14 +375,14 @@ class LadderManager:
             # Update ranks when challenger wins
             db_update_rankings(division_type, winning_team, losing_team)
             remove_challenge(division_type, winning_team)
-            return f"Team {winning_team} has won the match and taken the rank of Team {losing_team}! Team {losing_team} moves down one in the ranks. This report was made by an Administrator."
+            return f"🏆 Team {winning_team} has won the match and taken the rank of Team {losing_team}! Team {losing_team} moves down one in the ranks. This report was made by an Administrator. 🏆"
         else:
             # If the winning team was the challenged team, no rank change occurs
             losing_team = find_opponent_team(division_type, winning_team)
             add_team_wins_losses(division_type, winning_team, win=True)
             add_team_wins_losses(division_type, losing_team, win=False)
             remove_challenge(division_type, losing_team)
-            return f"Team {winning_team} has won the match against Team {losing_team}, but no rank changes occur since Team {winning_team} was the challenged team. This report was made by an Administrator."
+            return f"🏆 Team {winning_team} has won the match against Team {losing_team}, but no rank changes occur since Team {winning_team} was the challenged team. This report was made by an Administrator. 🏆"
 
     def set_rank(self, team_name: str, new_rank: int):
         """
@@ -399,7 +412,7 @@ class LadderManager:
         else:
             # Update the ranks if all conditions pass
             db_set_rank(division_type, team_name, new_rank, current_rank)
-            return f"Team {team_name} has been assigned to the rank of {new_rank} in the {division_type} division."
+            return f"📈 Team {team_name} has been assigned to the rank of {new_rank} in the {division_type} division. 📈"
     
     def add_win(self, team_name: str):
         """
@@ -501,38 +514,28 @@ class LadderManager:
 
         return formatted_challenges_data
     
-    def set_1v1_standings_channel(self, channel: discord.TextChannel):
+    def set_standings_channel(self, division_type: str, channel: discord.TextChannel):
         """
         Method for manager to set the discord channel
-        for the updating 1v1 standings board
+        for the updating standings board for given
+        division type
         """
+        # Grab channel's integer ID
+        channel_id = channel.id
+
+        # Tells database to add the integer to correct division type
+        db_set_standings_channel(division_type, channel_id)
+        return f"🏆 The {division_type} standings channel has been set to #{channel}. 🏆"
     
-    def set_2v2_standings_channel(self, channel: discord.TextChannel):
+    def set_challenges_channel(self, division_type: str, channel: discord.TextChannel):
         """
         Method for manager to set the discord channel
-        for the updating 2v2 standings board
+        for the updating challenges board for given
+        division type 
         """
-    
-    def set_3v3_standings_channel(self, channel: discord.TextChannel):
-        """
-        Method for manager to set the discord channel
-        for the updating 3v3 standings board
-        """
-    
-    def set_1v1_challenges_channel(self, channel: discord.TextChannel):
-        """
-        Method for manager to set the discord channel
-        for the updating 1v1 challenges board
-        """
-    
-    def set_2v2_challenges_channel(self, channel: discord.TextChannel):
-        """
-        Method for manager to set the discord channel
-        for the updating 2v2 challenges board
-        """
-    
-    def set_3v3_challenges_channel(self, channel: discord.TextChannel):
-        """
-        Method for manager to set the discord channel
-        for the updating 3v3 challenges board
-        """
+        # Grabs channel's integer ID
+        channel_id = channel.id
+
+        # Tell database to add integer to correct division type
+        db_set_challenges_channel(division_type, channel_id)
+        return f"⚔️ The {division_type} challenges channel has been set to #{channel}. ⚔️"

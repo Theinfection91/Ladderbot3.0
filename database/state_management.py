@@ -35,3 +35,33 @@ def set_ladder_running(division_type: str, true_or_false: bool):
     
     conn.commit()
     conn.close()
+
+def db_set_standings_channel(division_type: str, channel_id: int):
+    """
+    Sets the channel ID of the 
+    standings to given integer value
+    and given division type
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    # Update table with channel id integer
+    cursor.execute("UPDATE states SET standings_channel_id = ? WHERE division = ?", (channel_id, division_type))
+
+    conn.commit()
+    conn.close()
+
+def db_set_challenges_channel(division_type: str, channel_id: int):
+    """
+    Sets the channel ID of the
+    challenges to the given integer
+    value and given division type
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    # Update table with channel id integer
+    cursor.execute("UPDATE states SET challenges_channel_id = ? WHERE division = ?", (channel_id, division_type))
+
+    conn.commit()
+    conn.close()
