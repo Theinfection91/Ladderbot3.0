@@ -75,12 +75,19 @@ class LadderManager:
             if is_ladder_running(division_type):
                 print(f"The {division_type} division of the ladder is currently running.")
         
+        if is_challenges_channel_set(division_type):
+            challenge_channel_id = get_challenges_channel_id(division_type)
+            challenge_channel = self.bot.get_channel(challenge_channel_id)
+            if isinstance(challenge_channel, discord.TextChannel):
+                await self.update_challenges_message(division_type, challenge_channel)
+                self.periodic_update_challenges.start()
+        
         for division_type in VALID_DIVISION_TYPES:
             if is_standings_channel_set(division_type):
-                channel_id = get_standings_channel_id(division_type)
-                channel = self.bot.get_channel(channel_id)
-                if isinstance(channel, discord.TextChannel):
-                    await self.update_standings_message(division_type, channel)
+                standings_channel_id = get_standings_channel_id(division_type)
+                standings_channel = self.bot.get_channel(standings_channel_id)
+                if isinstance(standings_channel, discord.TextChannel):
+                    await self.update_standings_message(division_type, standings_channel)
                     self.periodic_update_standings.start()
     
     def start_ladder(self, division_type):
@@ -517,7 +524,7 @@ class LadderManager:
 
         return formatted_standings_data
 
-    def post_challenges(self, division_type: str):
+    async def post_challenges(self, division_type: str):
         """
         Method for everyone to post the current
         challenges of a given division type into
@@ -552,8 +559,6 @@ class LadderManager:
             
         # Initialize or update the standings message in the new channel
         await self.update_standings_message(division_type, channel)
-
-        task_running = self.periodic_update_standings.is_running()
         
         try:
             self.periodic_update_standings.restart()
@@ -571,10 +576,11 @@ class LadderManager:
         if not is_standings_channel_set(division_type):
             return f"The standings channel for the {division_type} division has not been set yet. You can set it for specific division types by using /set_standings_channel division_type #channel-name"
         else:
+            self.periodic_update_standings.stop()
             db_clear_standings_channel(division_type)
             return f"The standings channel for the {division_type} division has been cleared."
     
-    def set_challenges_channel(self, division_type: str, channel: discord.TextChannel):
+    async def set_challenges_channel(self, division_type: str, channel: discord.TextChannel):
         """
         Method for manager to set the discord channel
         for the updating challenges board for given
@@ -584,11 +590,22 @@ class LadderManager:
         if division_type not in VALID_DIVISION_TYPES:
             return f"Invalid division type was given. Please try again using 1v1, 2v2, or 3v3 after /set_challenges_channel\n\tExample: /set_challenges_channel 3v3 #3v3-challenges"
         
+        db_clear_challenges_channel(division_type)
+        
         # Grabs channel's integer ID
         channel_id = channel.id
 
         # Tell database to add integer to correct division type
         db_set_challenges_channel(division_type, channel_id)
+
+        # Init or update the challenges message in the channel
+        await self.update_challenges_message(division_type, channel)
+
+        try:
+            self.periodic_update_challenges.restart()
+        except Exception as e:
+            print(f"Error starting periodic update task: {e}")
+
         return f"⚔️ The {division_type} challenges channel has been set to #{channel.mention}. ⚔️"
     
     def clear_challenges_channel(self, division_type: str):
@@ -599,6 +616,7 @@ class LadderManager:
         if not is_challenges_channel_set(division_type):
             return f"The challenges channel for the {division_type} division has not been set yet. You can set it for specific division types by using /set_challenges_channel division_type #channel-name"
         else:
+            self.periodic_update_challenges.stop()
             db_clear_challenges_channel(division_type)
             return f"The challenges channel for the {division_type} division has been cleared."
     
@@ -636,6 +654,40 @@ class LadderManager:
         except Exception as e:
             # Log the exception or handle it accordingly
             print(f"An error occurred: {e}")
+
+    async def update_challenges_message(self, division_type: str, channel: discord.TextChannel):
+        """
+        Internal method used to edit the challenge board
+        that appears in the designated division challenges channel.
+
+        If no message exists to edit, a new message is
+        created in the designated division standings channel.
+        """
+        try:
+            # Get latest message from channel history
+            async for message in channel.history(limit=1):
+                challenges_message = message
+                break
+            else:
+                # If no message is found, set to None
+                challenges_message = None
+
+            challenges_text = await self.post_challenges(division_type)
+
+            # Add time stamp
+            time_stamp = await add_time_stamp()
+            challenges_text += time_stamp
+
+            if challenges_message:
+                # Update the existing message
+                await challenges_message.edit(content=challenges_text)
+            else:
+                # Send a new message if none exists
+                await channel.send(content=challenges_text)
+        
+        except Exception as e:
+            # Log the exception or handle it accordingly
+            print(f"An error occurred: {e}")
         
     @tasks.loop(seconds=15)
     async def periodic_update_standings(self):
@@ -650,3 +702,17 @@ class LadderManager:
                 channel = self.bot.get_channel(channel_id)
                 if isinstance(channel, discord.TextChannel):
                     await self.update_standings_message(division_type, channel)
+    
+    @tasks.loop(seconds=15)
+    async def periodic_update_challenges(self):
+        """
+        Internal task method that will update
+        the separate challenges that appears in the
+        designated division standings channel every 15 seconds.
+        """
+        for division_type in VALID_DIVISION_TYPES:
+            channel_id = get_challenges_channel_id(division_type)
+            if channel_id:
+                channel = self.bot.get_channel(channel_id)
+                if isinstance(channel, discord.TextChannel):
+                    await self.update_challenges_message(division_type, channel)

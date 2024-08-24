@@ -252,7 +252,7 @@ class Ladderbot(commands.Cog):
         for the given division type
         """
 
-        result = self.ladder_manager.set_challenges_channel(division_type, channel)
+        result = await self.ladder_manager.set_challenges_channel(division_type, channel)
         await ctx.send(result)
     
     @commands.command()
