@@ -29,6 +29,15 @@ class Ladderbot(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
+    async def create_test_teams(self, ctx, division_type: str):
+        """
+        Create 5 test teams fast for debugging
+        """
+        result = self.ladder_manager.create_test_teams(division_type)
+        await ctx.send(result)
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
     async def end_ladder(self, ctx, division_type: str):
         """
         Method for ending the ladder in
@@ -186,15 +195,6 @@ class Ladderbot(commands.Cog):
         """
         result = self.ladder_manager.subtract_loss(team_name)
         await ctx.send(result)
-
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def create_test_teams(self, ctx, division_type: str):
-        """
-        Create 5 test teams fast for debugging
-        """
-        result = self.ladder_manager.create_test_teams(division_type)
-        await ctx.send(result)
     
     @commands.command()
     async def post_standings(self, ctx, division_type: str):
@@ -216,6 +216,66 @@ class Ladderbot(commands.Cog):
         this was called from.
         """
         result = self.ladder_manager.post_challenges(division_type)
+        await ctx.send(result)
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def set_1v1_standings_channel(self, ctx, channel: discord.TextChannel):
+        """
+        Admin command to set the updating 1v1
+        standings board to specified channel
+        """
+        result = self.ladder_manager.set_1v1_standings_channel(channel)
+        await ctx.send(result)
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def set_2v2_standings_channel(self, ctx, channel: discord.TextChannel):
+        """
+        Admin command to set the updating 2v2
+        standings board to specified channel
+        """
+        result = self.ladder_manager.set_2v2_standings_channel(channel)
+        await ctx.send(result)
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def set_3v3_standings_channel(self, ctx, channel: discord.TextChannel):
+        """
+        Admin command to set the updating 3v3
+        standings board to specified channel
+        """
+        result = self.ladder_manager.set_3v3_standings_channel(channel)
+        await ctx.send(result)
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def set_1v1_challenges_channel(self, ctx, channel: discord.TextChannel):
+        """
+        Admin command to set the updating 1v1
+        challenges board to specified channel
+        """
+        result = self.ladder_manager.set_1v1_challenges_channel(channel)
+        await ctx.send(result)
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def set_2v2_challenges_channel(self, ctx, channel: discord.TextChannel):
+        """
+        Admin command to set the updating 2v2
+        challenges board to specified channel
+        """
+        result = self.ladder_manager.set_2v2_challenges_channel(channel)
+        await ctx.send(result)
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def set_3v3_challenges_channel(self, ctx, channel: discord.TextChannel):
+        """
+        Admin command to set the updating 3v3
+        challenges board to specified channel
+        """
+        result = self.ladder_manager.set_3v3_challenges_channel(channel)
         await ctx.send(result)
 
 # Define bot prefix and intents

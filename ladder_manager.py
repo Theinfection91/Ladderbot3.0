@@ -500,4 +500,39 @@ class LadderManager:
         formatted_challenges_data = format_challenges_data(division_type ,raw_challenges_data)
 
         return formatted_challenges_data
-
+    
+    def set_1v1_standings_channel(self, channel: discord.TextChannel):
+        """
+        Method for manager to set the discord channel
+        for the updating 1v1 standings board
+        """
+    
+    def set_2v2_standings_channel(self, channel: discord.TextChannel):
+        """
+        Method for manager to set the discord channel
+        for the updating 2v2 standings board
+        """
+    
+    def set_3v3_standings_channel(self, channel: discord.TextChannel):
+        """
+        Method for manager to set the discord channel
+        for the updating 3v3 standings board
+        """
+    
+    def set_1v1_challenges_channel(self, channel: discord.TextChannel):
+        """
+        Method for manager to set the discord channel
+        for the updating 1v1 challenges board
+        """
+    
+    def set_2v2_challenges_channel(self, channel: discord.TextChannel):
+        """
+        Method for manager to set the discord channel
+        for the updating 2v2 challenges board
+        """
+    
+    def set_3v3_challenges_channel(self, channel: discord.TextChannel):
+        """
+        Method for manager to set the discord channel
+        for the updating 3v3 challenges board
+        """
