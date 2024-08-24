@@ -60,7 +60,7 @@ class Ladderbot(commands.Cog):
     
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def remove_team(self, ctx, team_name: str, division_type: str):
+    async def remove_team(self, ctx, team_name: str):
         """
         Removes a team within a specifed division
 
@@ -75,7 +75,7 @@ class Ladderbot(commands.Cog):
         Output:
             Team Delta from the 1v1 division has been removed from the Ladder.
         """
-        result = self.ladder_manager.remove_team(division_type, team_name)
+        result = self.ladder_manager.remove_team(team_name)
         await ctx.send(result)
 
     @commands.command()
@@ -165,6 +165,26 @@ class Ladderbot(commands.Cog):
         ONE win to the given team
         """
         result = self.ladder_manager.subtract_win(team_name)
+        await ctx.send(result)
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def add_loss(self, ctx, team_name: str):
+        """
+        Admin method to manually increment
+        ONE loss to the given team
+        """
+        result = self.ladder_manager.add_loss(team_name)
+        await ctx.send(result)
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def subtract_loss(self, ctx, team_name: str):
+        """
+        Admin method to manually decrement
+        ONE loss to the given team
+        """
+        result = self.ladder_manager.subtract_loss(team_name)
         await ctx.send(result)
 
     @commands.command()

@@ -122,17 +122,20 @@ class LadderManager:
         else:
             return f"Team {team_name} is already being used. Please choose another team name."
         
-        
-    def remove_team(self, division_type, team_name):
+    def remove_team(self, team_name):
         """
         Finds the correct team and tells
         the database to remove them completely
         """
-        if does_team_exist(team_name):
-            db_remove_team(division_type, team_name)
-            return f"Team {team_name} from the {division_type} division has been removed from the Ladder."
-        else:
-            return f"No team named Team {team_name} found for the {division_type} division. Please try again."
+        # See if team exists in the database
+        if not does_team_exist(team_name):
+            return f"No team found by the name of {team_name}. Please try again."
+        
+        # If team exists grab the division they are in
+        division_type = check_team_division(team_name)
+
+        db_remove_team(division_type, team_name)
+        return f"Team {team_name} from the {division_type} division has been removed from the Ladder."
         
     def challenge(self, ctx, challenger_team: str, challenged_team: str):
         """
