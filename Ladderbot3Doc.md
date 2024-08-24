@@ -1,17 +1,5 @@
 # Ladder Bot Documentation v3.0
 
-## Overview
-**Ladderbot** is a versatile Discord bot designed to manage and facilitate competitive ladder systems for teams within various divisions. This bot leverages the `LadderManager` class to interact with the underlying database, enabling a range of functionalities through Discord commands. 
-
-### Key Features:
-
-- **Ladder Management**: Start and end ladders for specific divisions (1v1, 2v2, 3v3) with administrative commands.
-- **Team Management**: Register and remove teams from the ladder
-- **Challenge System**: Allow teams to challenge each other and manage these challenges. Admins have additional capabilities to manually create or cancel challenges.
-- **Match Reporting**: Report match results to update standings and ranks, with both user-level and admin-level commands for reporting wins and adjusting ranks.
-- **Standings and Challenges**: Post current standings and challenges in specific channels, with options to set channels for automatic updates.
-- **Administrative Controls**: Admins have extended functionalities to manually adjust team ranks, wins, and losses.
-
 ### Usage:
 
 Commands are accessible through a simple prefix (`/`) and include options for both general users and administrators. The bot is initialized with specific intents to ensure proper functioning, such as handling member updates and message content.
