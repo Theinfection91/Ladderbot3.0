@@ -19,7 +19,7 @@ class Ladderbot(commands.Cog):
     
     @commands.Cog.listener()
     async def on_ready(self):
-        self.ladder_manager.on_ready(bot)
+        await self.ladder_manager.on_ready()
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -208,7 +208,7 @@ class Ladderbot(commands.Cog):
         division type into the channel this
         was called from.
         """
-        result = self.ladder_manager.post_standings(division_type)
+        result = await self.ladder_manager.post_standings(division_type)
         await ctx.send(result)
 
     @commands.command()
@@ -230,7 +230,7 @@ class Ladderbot(commands.Cog):
         standings board to specified channel
         for the given division type
         """
-        result = self.ladder_manager.set_standings_channel(division_type, channel)
+        result = await self.ladder_manager.set_standings_channel(division_type, channel)
         await ctx.send(result)
 
     @commands.command()
@@ -276,7 +276,7 @@ intents.message_content = True
 bot = commands.Bot(command_prefix='/', intents=intents)
 
 async def main():
-    ladder_manger = LadderManager()
+    ladder_manger = LadderManager(bot)
 
     # Add cog (class) to the bot
     await bot.add_cog(Ladderbot(bot, ladder_manger))

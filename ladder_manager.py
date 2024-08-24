@@ -1,10 +1,11 @@
 # Import the different divisions here
 
 import discord
+from discord.ext import tasks
 
 from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel, is_standings_channel_set, get_standings_channel_id, is_challenges_channel_set, get_challenges_channel_id, db_clear_standings_channel, db_clear_challenges_channel
 
-from utils import is_correct_member_size, create_members_string, format_standings_data, format_challenges_data
+from utils import is_correct_member_size, create_members_string, format_standings_data, format_challenges_data, add_time_stamp
 
 from config import VALID_DIVISION_TYPES
 
@@ -17,7 +18,7 @@ class LadderManager:
 
     The LadderManager is controlled by the Ladderbot in main.py
     """
-    def __init__(self):
+    def __init__(self, bot):
         """
         Constructs the LadderManager class
 
@@ -28,8 +29,12 @@ class LadderManager:
         is already apart of a team in the same division, and various
         other tasks that a manager of a tournament would do.
         """
+        self.bot = bot
+        
         #Init the ladderbot.db when the LadderManager is instantiated
         initialize_database()
+
+        self.periodic_update_standings.start()
 
     def create_test_teams(self, division_type):
         
@@ -57,18 +62,26 @@ class LadderManager:
             db_register_team('3v3', "E", "Theinfection1991")
             return f"Created five 3v3 test teams"
     
-    def on_ready(self, bot):
+    async def on_ready(self):
         """
         Logic for on_ready listener for when
         the bot starts up
         """
         # Show the bot has logged in to server showing it's username
-        print(f"Logged in as {bot.user}")
+        print(f"Logged in as {self.bot.user}")
 
         # Check if any ladders are currently running, if so print which ones
-        for division in VALID_DIVISION_TYPES:
-            if is_ladder_running(division):
-                print(f"The {division} division of the ladder is currently running.")
+        for division_type in VALID_DIVISION_TYPES:
+            if is_ladder_running(division_type):
+                print(f"The {division_type} division of the ladder is currently running.")
+        
+        for division_type in VALID_DIVISION_TYPES:
+            if is_standings_channel_set(division_type):
+                channel_id = get_standings_channel_id(division_type)
+                channel = self.bot.get_channel(channel_id)
+                if isinstance(channel, discord.TextChannel):
+                    await self.update_standings_message(division_type, channel)
+                    self.periodic_update_standings.start()
     
     def start_ladder(self, division_type):
         """
@@ -490,7 +503,7 @@ class LadderManager:
             subtract_team_wins_losses(division_type, team_name, False)
             return f"Team {team_name} has had a loss taken away by an Administrator. They now have {current_losses - 1} losses."
         
-    def post_standings(self, division_type: str):
+    async def post_standings(self, division_type: str):
         """
         Method for everyone to post the current
         standings of a given division type into
@@ -518,22 +531,37 @@ class LadderManager:
 
         return formatted_challenges_data
     
-    def set_standings_channel(self, division_type: str, channel: discord.TextChannel):
+    async def set_standings_channel(self, division_type: str, channel: discord.TextChannel):
         """
         Method for manager to set the discord channel
         for the updating standings board for given
         division type
         """
+        
         # Check if correct division type was entered
         if division_type not in VALID_DIVISION_TYPES:
             return f"Invalid division type was given. Please try again using 1v1, 2v2, or 3v3 after /set_standings_channel\n\tExample: /set_standings_channel 2v2 #2v2-standings"
-        
+            
+        db_clear_standings_channel(division_type)
+            
         # Grab channel's integer ID
         channel_id = channel.id
 
         # Tells database to add the integer to correct division type
         db_set_standings_channel(division_type, channel_id)
-        return f"🏆 The {division_type} standings channel has been set to #{channel}. 🏆"
+            
+        # Initialize or update the standings message in the new channel
+        await self.update_standings_message(division_type, channel)
+
+        task_running = self.periodic_update_standings.is_running()
+        
+        try:
+            self.periodic_update_standings.restart()
+        except Exception as e:
+            print(f"Error starting periodic update task: {e}")
+
+        return f"🏆 The {division_type} standings channel has been set to #{channel.mention}. 🏆"
+
     
     def clear_standings_channel(self, division_type: str):
         """
@@ -561,7 +589,7 @@ class LadderManager:
 
         # Tell database to add integer to correct division type
         db_set_challenges_channel(division_type, channel_id)
-        return f"⚔️ The {division_type} challenges channel has been set to #{channel}. ⚔️"
+        return f"⚔️ The {division_type} challenges channel has been set to #{channel.mention}. ⚔️"
     
     def clear_challenges_channel(self, division_type: str):
         """
@@ -573,3 +601,52 @@ class LadderManager:
         else:
             db_clear_challenges_channel(division_type)
             return f"The challenges channel for the {division_type} division has been cleared."
+    
+    async def update_standings_message(self, division_type: str, channel: discord.TextChannel):
+        """
+        Internal method used to edit the scoreboard
+        that appears in the designated division standings channel.
+
+        If no message exists to edit, a new message is
+        created in the designated division standings channel.
+        """
+        try:
+            # Get the latest message from the channel's history
+            async for message in channel.history(limit=1):
+                standings_message = message
+                break
+            else:
+                # If no messages are found, set to None
+                standings_message = None
+
+            # Generate the standings text
+            standings_text = await self.post_standings(division_type)
+
+            # Add a time stamp
+            time_stamp = await add_time_stamp()
+            standings_text += time_stamp
+
+            if standings_message:
+                # Update the existing message in the given division standings channel
+                await standings_message.edit(content=standings_text)
+            else:
+                # Send a new message if none exists in the division standings channel
+                await channel.send(content=standings_text)
+
+        except Exception as e:
+            # Log the exception or handle it accordingly
+            print(f"An error occurred: {e}")
+        
+    @tasks.loop(seconds=15)
+    async def periodic_update_standings(self):
+        """
+        Internal task method that will update
+        the separate scoreboard that appears in the
+        designated division standings channel every 15 seconds.
+        """
+        for division_type in VALID_DIVISION_TYPES:
+            channel_id = get_standings_channel_id(division_type)
+            if channel_id:
+                channel = self.bot.get_channel(channel_id)
+                if isinstance(channel, discord.TextChannel):
+                    await self.update_standings_message(division_type, channel)
