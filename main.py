@@ -265,6 +265,19 @@ class Ladderbot(commands.Cog):
         result = self.ladder_manager.clear_challenges_channel(division_type)
         await ctx.send(result)
 
+    @commands.command()
+    async def show_help(self, ctx):
+        """
+        Provides a link to the bot documentation
+        """
+        help_text = """
+    **For more detailed information, refer to the bot's documentation.**
+    ** https://github.com/Theinfection91/Ladderbot3.0/blob/main/Ladderbot3Doc.md **
+        """
+
+        # Send the help text to the channel this method was called from
+        await ctx.send(help_text)
+
 # Define bot prefix and intents
 intents = discord.Intents.default()
 intents.typing = False
