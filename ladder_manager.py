@@ -3,7 +3,7 @@
 import discord
 from discord.ext import tasks
 
-from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel, is_standings_channel_set, get_standings_channel_id, is_challenges_channel_set, get_challenges_channel_id, db_clear_standings_channel, db_clear_challenges_channel, get_team_members
+from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel, is_standings_channel_set, get_standings_channel_id, is_challenges_channel_set, get_challenges_channel_id, db_clear_standings_channel, db_clear_challenges_channel, get_team_members, db_clear_all_challenges, db_clear_all_teams
 
 from utils import is_correct_member_size, create_members_string, format_standings_data, format_challenges_data, add_time_stamp
 
@@ -104,10 +104,20 @@ class LadderManager:
         """
         
         """
+        # Check if correct division type was entered
+        if division_type not in VALID_DIVISION_TYPES:
+            return f"Invalid division type was given. Please try again using 1v1, 2v2, or 3v3."
+
         if not is_ladder_running(division_type):
             return f"The {division_type} division of the ladder is not currently running..."
         
+        # Set ladder running to False for given division
         set_ladder_running(division_type, False)
+
+        # Clear challenges and teams for given division
+        db_clear_all_challenges(division_type)
+        db_clear_all_teams(division_type)
+
         return f"💥 The {division_type} division of the ladder has ended! 💥"
 
     def register_team(self, division_type: str, team_name: str, *members: discord.Member):
@@ -567,6 +577,9 @@ class LadderManager:
         standings of a given division type into
         the channel this was called from
         """
+        if division_type not in VALID_DIVISION_TYPES:
+            return f"Invalid division type entered. Example: /post_standings 2v2"
+        
         # Get standings data from database for given division type
         raw_standings_data = get_standings_data(division_type)
 
@@ -581,6 +594,9 @@ class LadderManager:
         challenges of a given division type into
         the channel this was called from
         """
+        if division_type not in VALID_DIVISION_TYPES:
+            return f"Invalid division type entered. Example: /post_challenges 1v1"
+        
         # Get challenges data from database for given division type
         raw_challenges_data = get_challenges_data(division_type)
 

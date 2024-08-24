@@ -398,3 +398,15 @@ def db_remove_team(division_type: str, team_name: str):
     # Commit and close connection
     conn.commit()
     conn.close()
+
+def db_clear_all_teams(division_type: str):
+    """
+    Clear all teams in the given division from the database.
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM teams WHERE division = ?", (division_type,))
+
+    conn.commit()
+    conn.close()

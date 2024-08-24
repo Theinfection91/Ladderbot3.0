@@ -199,3 +199,17 @@ def remove_challenge(division_type: str, team_name: str):
     
     conn.commit()
     conn.close()
+
+def db_clear_all_challenges(division_type: str):
+    """
+    Clears all challenges from the table corresponding to the given division type.
+    """
+    table_name = f"challenges_{division_type}"
+    
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute(f"DELETE FROM {table_name}")
+
+    conn.commit()
+    conn.close()
