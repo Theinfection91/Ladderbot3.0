@@ -122,6 +122,20 @@ def is_member_on_team(display_name: str, team_name: str):
     # If display name is not found in members_list, return False
     return False
 
+def get_team_members(team_name: str):
+    """
+    Returns all members on a given team
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT members FROM teams WHERE team_name =?", (team_name,))
+    members = cursor.fetchone()
+
+    conn.close()
+
+    return members if members else None
+
 
 def give_team_rank(division_type: str, team_name: str):
     """

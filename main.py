@@ -99,7 +99,7 @@ class Ladderbot(commands.Cog):
         since team names are set to be unique across
         all divisions (Cant have a Team Alpha in 1v1 and Team Alpha in 2v2)
         """
-        result = self.ladder_manager.challenge(ctx, challenger_team, challenged_team)
+        result = await self.ladder_manager.challenge(ctx, challenger_team, challenged_team)
         await ctx.send(result)
 
     @commands.command()
