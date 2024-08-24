@@ -1,7 +1,9 @@
 # Import the different divisions here
 
 import discord
+
 from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel
+
 from utils import is_correct_member_size, create_members_string, format_standings_data, format_challenges_data
 
 class LadderManager:
@@ -520,6 +522,10 @@ class LadderManager:
         for the updating standings board for given
         division type
         """
+        # Check if correct division type was entered
+        if division_type != '1v1' or '2v2' or '3v3':
+            return f"Invalid division type was given. Please try again using 1v1, 2v2, or 3v3 after /set_standings_channel\n\tExample: /set_standings_channel 2v2 #2v2-standings"
+        
         # Grab channel's integer ID
         channel_id = channel.id
 
@@ -533,6 +539,10 @@ class LadderManager:
         for the updating challenges board for given
         division type 
         """
+        # Check if correct division type was entered
+        if division_type != '1v1' or '2v2' or '3v3':
+            return f"Invalid division type was given. Please try again using 1v1, 2v2, or 3v3 after /set_challenges_channel\n\tExample: /set_challenges_channel 3v3 #3v3-challenges"
+        
         # Grabs channel's integer ID
         channel_id = channel.id
 
