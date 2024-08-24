@@ -4,7 +4,19 @@ import asyncio
 
 from ladder_manager import LadderManager
 
+"""
+Delete 'from my_token import MY_DISCORD_TOKEN' when manually
+entering a full token string at the bottom of the code
+
+To use the my_token import correctly, please refer to the
+NOTE's at the very bottom of the code in main() function
+"""
+
 from my_token import MY_DISCORD_TOKEN
+
+"""
+NOTE
+"""
 
 class Ladderbot(commands.Cog):
     """
@@ -294,7 +306,25 @@ async def main():
     # Add cog (class) to the bot
     await bot.add_cog(Ladderbot(bot, ladder_manger))
 
-    # Add Discord Token for bot received from Discord Developer Portal
+    
+    """
+    NOTE: IF USING A MANUAL TOKEN, GO BACK TO TOP OF CODE AND DELETE THE 'from my_token import MY_DISCORD_TOKEN' LINE
+    Remove the MY_DISCORD_TOKEN variable below and enter paste your Discord Bot Token in-between a pair of single quotes and save file
+        
+        Example: await bot.start('long_string_that_is_your_discord_token')
+        
+    """
+    
+
+    """
+    NOTE: ALTERNATIVELY, CREATE A FILE CALLED my_token.py IN SAME FOLDER AS main.py
+    INSIDE my_token.py YOU ONLY NEED ONE LINE OF CODE WHICH IS:
+    
+        MY_DISCORD_TOKEN = 'long_string_that_is_your_discord_token'
+    
+    BY DOING THIS METHOD, DO NOT DELETE THE 'from my_token import MY_DISCORD_TOKEN' AT TOP OF THIS CODE
+    
+    """
     await bot.start(MY_DISCORD_TOKEN)
 
 asyncio.run(main())
