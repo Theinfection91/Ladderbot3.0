@@ -20,7 +20,7 @@ class Ladderbot(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.ladder_manager.on_ready(bot)
-    
+
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def start_ladder(self, ctx, division_type: str):

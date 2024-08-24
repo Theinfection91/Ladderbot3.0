@@ -62,8 +62,10 @@ class LadderManager:
         Logic for on_ready listener for when
         the bot starts up
         """
+        # Show the bot has logged in to server showing it's username
         print(f"Logged in as {bot.user}")
 
+        # Check if any ladders are currently running, if so print which ones
         for division in VALID_DIVISION_TYPES:
             if is_ladder_running(division):
                 print(f"The {division} division of the ladder is currently running.")
