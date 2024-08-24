@@ -36,6 +36,79 @@ def set_ladder_running(division_type: str, true_or_false: bool):
     conn.commit()
     conn.close()
 
+def is_standings_channel_set(division_type: str):
+    """
+    Checks if there is data within the given
+    division's standing channel id that
+    will return true or false
+    """
+
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT standings_channel_id FROM states WHERE division = ?", (division_type,))
+    result = cursor.fetchone()[0]
+
+    conn = conn.close()
+
+    if result is None:
+        return False
+    
+    else:
+        return True
+
+def get_standings_channel_id(division_type: str):
+    """
+    Returns the integer id for the channel
+    that is set for the given division type
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT standings_channel_id FROM states WHERE division = ?", (division_type,))
+    result = cursor.fetchone()[0]
+
+    conn = conn.close()
+
+    if result is not None:
+        return result
+    
+def is_challenges_channel_set(division_type: str):
+    """
+    Checks if there is data within the given
+    division's challenge channel id that
+    will return true or false
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT challenges_channel_id FROM states WHERE division = ?", (division_type,))
+    result = cursor.fetchone()[0]
+
+    conn = conn.close()
+
+    if result is None:
+        return False
+    
+    else:
+        return True
+
+def get_challenges_channel_id(division_type: str):
+    """
+    Returns the integer id for the channel
+    that is set for the given division type
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT challenges_channel_id FROM states WHERE division = ?", (division_type,))
+    result = cursor.fetchone()[0]
+
+    conn = conn.close()
+
+    if result is not None:
+        return result
+
 def db_set_standings_channel(division_type: str, channel_id: int):
     """
     Sets the channel ID of the 
@@ -51,6 +124,19 @@ def db_set_standings_channel(division_type: str, channel_id: int):
     conn.commit()
     conn.close()
 
+def db_clear_standings_channel(division_type: str):
+    """
+    Sets the standings channel id to None
+    in the given division type
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE states SET standings_channel_id = ? WHERE division = ?", (None, division_type))
+
+    conn.commit()
+    conn.close()
+
 def db_set_challenges_channel(division_type: str, channel_id: int):
     """
     Sets the channel ID of the
@@ -62,6 +148,19 @@ def db_set_challenges_channel(division_type: str, channel_id: int):
 
     # Update table with channel id integer
     cursor.execute("UPDATE states SET challenges_channel_id = ? WHERE division = ?", (channel_id, division_type))
+
+    conn.commit()
+    conn.close()
+
+def db_clear_challenges_channel(division_type: str):
+    """
+    Sets the challenges channel id to None
+    in the given division type
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE states SET challenges_channel_id = ? WHERE division = ?", (None, division_type))
 
     conn.commit()
     conn.close()

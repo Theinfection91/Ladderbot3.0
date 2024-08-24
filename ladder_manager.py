@@ -2,9 +2,11 @@
 
 import discord
 
-from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel
+from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel, is_standings_channel_set, get_standings_channel_id, is_challenges_channel_set, get_challenges_channel_id, db_clear_standings_channel, db_clear_challenges_channel
 
 from utils import is_correct_member_size, create_members_string, format_standings_data, format_challenges_data
+
+from config import VALID_DIVISION_TYPES
 
 class LadderManager:
     """
@@ -62,9 +64,7 @@ class LadderManager:
         """
         print(f"Logged in as {bot.user}")
 
-        divisions = ['1v1', '2v2', '3v3']
-
-        for division in divisions:
+        for division in VALID_DIVISION_TYPES:
             if is_ladder_running(division):
                 print(f"The {division} division of the ladder is currently running.")
     
@@ -88,7 +88,7 @@ class LadderManager:
         set_ladder_running(division_type, False)
         return f"💥 The {division_type} division of the ladder has ended! 💥"
 
-    def register_team(self, division_type: str, team_name: str, *members):
+    def register_team(self, division_type: str, team_name: str, *members: discord.Member):
         """
         Takes the input from the discord user and
         uses a series of help and validation functions
@@ -99,7 +99,7 @@ class LadderManager:
         if is_team_name_unique(team_name):
 
             # Check if correct divison type was entered
-            if division_type == '1v1' or '2v2' or '3v3':
+            if division_type in VALID_DIVISION_TYPES:
 
                 # Check if correct amount of members was given for the division type
                 if is_correct_member_size(division_type, *members):
@@ -523,7 +523,7 @@ class LadderManager:
         division type
         """
         # Check if correct division type was entered
-        if division_type != '1v1' or '2v2' or '3v3':
+        if division_type not in VALID_DIVISION_TYPES:
             return f"Invalid division type was given. Please try again using 1v1, 2v2, or 3v3 after /set_standings_channel\n\tExample: /set_standings_channel 2v2 #2v2-standings"
         
         # Grab channel's integer ID
@@ -533,6 +533,17 @@ class LadderManager:
         db_set_standings_channel(division_type, channel_id)
         return f"🏆 The {division_type} standings channel has been set to #{channel}. 🏆"
     
+    def clear_standings_channel(self, division_type: str):
+        """
+        Admin method to clear a division's standings
+        channel that has been set
+        """
+        if not is_standings_channel_set(division_type):
+            return f"The standings channel for the {division_type} division has not been set yet. You can set it for specific division types by using /set_standings_channel division_type #channel-name"
+        else:
+            db_clear_standings_channel(division_type)
+            return f"The standings channel for the {division_type} division has been cleared."
+    
     def set_challenges_channel(self, division_type: str, channel: discord.TextChannel):
         """
         Method for manager to set the discord channel
@@ -540,7 +551,7 @@ class LadderManager:
         division type 
         """
         # Check if correct division type was entered
-        if division_type != '1v1' or '2v2' or '3v3':
+        if division_type not in VALID_DIVISION_TYPES:
             return f"Invalid division type was given. Please try again using 1v1, 2v2, or 3v3 after /set_challenges_channel\n\tExample: /set_challenges_channel 3v3 #3v3-challenges"
         
         # Grabs channel's integer ID
@@ -549,3 +560,14 @@ class LadderManager:
         # Tell database to add integer to correct division type
         db_set_challenges_channel(division_type, channel_id)
         return f"⚔️ The {division_type} challenges channel has been set to #{channel}. ⚔️"
+    
+    def clear_challenges_channel(self, division_type: str):
+        """
+        Admin method to clear a division's challenges
+        channel that has been set
+        """
+        if not is_challenges_channel_set(division_type):
+            return f"The challenges channel for the {division_type} division has not been set yet. You can set it for specific division types by using /set_challenges_channel division_type #channel-name"
+        else:
+            db_clear_challenges_channel(division_type)
+            return f"The challenges channel for the {division_type} division has been cleared."

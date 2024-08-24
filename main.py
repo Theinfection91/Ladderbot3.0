@@ -232,6 +232,16 @@ class Ladderbot(commands.Cog):
         """
         result = self.ladder_manager.set_standings_channel(division_type, channel)
         await ctx.send(result)
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def clear_standings_channel(self, ctx, division_type: str):
+        """
+        Admin method to clear a division's standings
+        channel that has been set
+        """
+        result = self.ladder_manager.clear_standings_channel(division_type)
+        await ctx.send(result)
     
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -243,6 +253,16 @@ class Ladderbot(commands.Cog):
         """
 
         result = self.ladder_manager.set_challenges_channel(division_type, channel)
+        await ctx.send(result)
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def clear_challenges_channel(self, ctx, division_type: str):
+        """
+        Admin method to clear a division's challenges
+        channel that has been set
+        """
+        result = self.ladder_manager.clear_challenges_channel(division_type)
         await ctx.send(result)
 
 # Define bot prefix and intents

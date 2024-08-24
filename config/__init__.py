@@ -1,3 +1,3 @@
-from .settings import LADDERBOT_DB
+from .settings import LADDERBOT_DB, VALID_DIVISION_TYPES
 
-__all__ = [LADDERBOT_DB]
+__all__ = ['LADDERBOT_DB', 'VALID_DIVISION_TYPES']

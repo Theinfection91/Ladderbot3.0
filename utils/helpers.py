@@ -22,11 +22,12 @@ def format_standings_data(division_type: str, raw_standings_data):
     # Prepare the standings message
     header = f"🏆 **{division_type.upper()} Division Standings** 🏆\n"
     header += "```\n"
-    header += "{:<6} {:<15} {:<5} {:<5}\n".format("Rank", "Team Name", "Wins", "Losses")
-    header += "-" * 36 + "\n"
+    header += "| Rank | Team Name       | Wins | Losses |\n"
+    header += "|------|-----------------|------|--------|\n"
 
     standings_lines = [
-        "{:<6} {:<15} {:<5} {:<5}".format(rank, team_name, wins, losses)
+        f"| {rank:<4} | {team_name:<15} | {wins:<4} | {losses:<6} |"
+        "\n|------|-----------------|------|--------|"
         for team_name, rank, wins, losses in raw_standings_data
     ]
 
@@ -43,11 +44,12 @@ def format_challenges_data(division_type: str, raw_challenges_data):
     # Prepare the challenges message
     header = f"⚔️ **{division_type.upper()} Division Challenges** ⚔️\n"
     header += "```\n"
-    header += "{:<20} {:<20}\n".format("Challenger", "Challenged")
-    header += "-" * 41 + "\n"
+    header += "| Challenger         | Challenged         |\n"
+    header += "|--------------------|--------------------|\n"
 
     challenges_lines = [
-        "{:<20} {:<20}".format(challenger, challenged)
+        f"| {challenger:<18} | {challenged:<18} |"
+        "\n|--------------------|--------------------|"
         for challenger, challenged in raw_challenges_data
     ]
 
