@@ -7,6 +7,8 @@ from utils import is_correct_member_size, is_valid_division_type, create_members
 
 from config import VALID_DIVISION_TYPES
 
+from logs.logger import logger 
+
 class LadderManager:
     """
     This class will handle talking to the different divisions within
@@ -37,11 +39,13 @@ class LadderManager:
         self.periodic_update_challenges.start()
 
     def create_test_teams(self, division_type: str) -> str:
-        
+
         if not is_valid_division_type(division_type):
             return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. ❌"
-        
+
+
         if division_type == '1v1':
+            
             db_register_team('1v1', "Alpha", "Theinfection1991")
             db_register_team('1v1', "Bravo", "Theinfection1991")
             db_register_team('1v1', "Charlie", "Theinfection1991")
@@ -64,7 +68,7 @@ class LadderManager:
             db_register_team('3v3', "D", "Theinfection1991")
             db_register_team('3v3', "E", "Theinfection1991")
             return f"Created five 3v3 test teams"
-    
+  
     async def on_ready(self):
         """
         Logic for on_ready listener for when

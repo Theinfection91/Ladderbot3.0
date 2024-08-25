@@ -12,7 +12,9 @@ log_file = os.path.join(log_dir, 'ladderbot.log')
 
 # Create a logger instance
 logger = logging.getLogger('LadderLogs')
-logger.setLevel(logging.DEBUG)  # Set the desired log level
+
+# Set the desired log level
+logger.setLevel(logging.DEBUG) 
 
 # Remove all existing handlers
 for handler in logger.handlers[:]:
@@ -24,7 +26,9 @@ rotating_handler = RotatingFileHandler(
     maxBytes=5*1024*1024,    # Max file size in bytes (5 MB)
     backupCount=5            # Number of backup files to keep
 )
-rotating_handler.setLevel(logging.DEBUG)  # Set the handler level
+
+# Set the handler level
+rotating_handler.setLevel(logging.DEBUG)
 
 # Create a formatter and set it for the handler
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

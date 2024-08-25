@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 import asyncio
 
+from logs.logger import logger
+
 from ladder_manager import LadderManager
 
 """
@@ -53,6 +55,7 @@ class Ladderbot(commands.Cog):
         Output:
             The ladder in the 1v1 division has been started.
         """
+        logger.info(f'Command "start_ladder" invoked by {ctx.author} with division_type={division_type}')
         result = self.ladder_manager.start_ladder(division_type)
         await ctx.send(result)
 
@@ -74,6 +77,7 @@ class Ladderbot(commands.Cog):
         Output:
             5 test teams have been created in the 1v1 division.
         """
+        logger.info(f'Command "create_test_teams" invoked by {ctx.author} with division_type={division_type}')
         result = self.ladder_manager.create_test_teams(division_type)
         await ctx.send(result)
 
@@ -97,6 +101,7 @@ class Ladderbot(commands.Cog):
         Output:
             The 2v2 division of the ladder has ended!.
         """
+        logger.info(f'Command "end_ladder" invoked by {ctx.author} with division_type={division_type}')
         result = await self.ladder_manager.end_ladder(division_type)
         await ctx.send(result)
     
@@ -125,7 +130,8 @@ class Ladderbot(commands.Cog):
         Output:
             Team Alpha has been registered in the 2v2 division with the following members: Ixnay, Flaw
         """
-        
+        members_list = [member for member in members]
+        logger.info(f'Command "register_team" invoked by {ctx.author} with team_name={team_name} division_type={division_type} members={members_list}')
         result = self.ladder_manager.register_team(division_type, team_name, *members)
         await ctx.send(result)
     
@@ -149,6 +155,7 @@ class Ladderbot(commands.Cog):
         Output:
             Team Delta from the 3v3 division has been removed from the Ladder.
         """
+        logger.info(f'Command "remove_team" invoked by {ctx.author} with team_name={team_name}')
         result = self.ladder_manager.remove_team(team_name)
         await ctx.send(result)
 
@@ -177,6 +184,7 @@ class Ladderbot(commands.Cog):
         Output:
             Team Echo has challenged Team Delta in the 3v3 division!
         """
+        logger.info(f'Command "challenge" invoked by {ctx.author} with challenger_team={challenger_team} challenged_team={challenged_team}')
         result = await self.ladder_manager.challenge(ctx, challenger_team, challenged_team)
         await ctx.send(result)
 
@@ -196,6 +204,7 @@ class Ladderbot(commands.Cog):
         Output:
             The challenge made by Team Echo in the 3v3 division has been canceled by a team member.
         """
+        logger.info(f'Command "cancel_challenge" invoked by {ctx.author} with challenger_team={challenger_team}')
         result = self.ladder_manager.cancel_challenge(ctx, challenger_team)
         await ctx.send(result)
     
@@ -219,6 +228,7 @@ class Ladderbot(commands.Cog):
         Output:
             Team Echo has challenged Team Delta in the 3v3 division!. -This challenge was created by an Administrator.
         """
+        logger.info(f'Command "admin_challenge" invoked by {ctx.author} with challenger_team={challenger_team} challenged_team={challenged_team}')
         result = self.ladder_manager.admin_challenge(challenger_team, challenged_team)
         await ctx.send(result)
     
@@ -243,6 +253,7 @@ class Ladderbot(commands.Cog):
         Output:
             The challenge made by Team Echo in the 3v3 division has been canceled by an Administrator.
         """
+        logger.info(f'Command "admin_cancel_challenge" invoked by {ctx.author} with challenger_team={challenger_team}')
         result = self.ladder_manager.admin_cancel_challenge(challenger_team)
         await ctx.send(result)
     
@@ -272,6 +283,7 @@ class Ladderbot(commands.Cog):
             Team Echo has won the match and taken the rank of Team Delta! Team Delta moves down one in the ranks.
             Team Delta has won the match against Team Echo, but no rank changes occur since Team Delta was the challenged team.
         """
+        logger.info(f'Command "report_win" invoked by {ctx.author} with winning_team={winning_team}')
         result = self.ladder_manager.report_win(ctx, winning_team)
         await ctx.send(result)
 
@@ -294,6 +306,7 @@ class Ladderbot(commands.Cog):
             Team Charlie has won the match and taken the rank of Team Alpha! Team Alpha moves down one in the ranks. This report was made by an Administrator.
             Team Alpha has won the match against Team Charlie, but no rank changes occur since Team Alpha was the challenged team. This report was made by an Administrator.
         """
+        logger.info(f'Command "admin_report_win" invoked by {ctx.author} with winning_team={winning_team}')
         result = self.ladder_manager.admin_report_win(winning_team)
         await ctx.send(result)
     
@@ -320,6 +333,7 @@ class Ladderbot(commands.Cog):
         Output:
             Team Alpha has been assigned to the rank of 1 in the 1v1 division.
         """
+        logger.info(f'Command "set_rank" invoked by {ctx.author} with team_name={team_name} new_rank={new_rank}')
         result = self.ladder_manager.set_rank(team_name, new_rank)
         await ctx.send(result)
 
@@ -343,6 +357,7 @@ class Ladderbot(commands.Cog):
         Output:
             Team Alpha has been given a win by an Administrator.
         """
+        logger.info(f'Command "add_win" invoked by {ctx.author} with team_name={team_name}')
         result = self.ladder_manager.add_win(team_name)
         await ctx.send(result)
     
@@ -366,6 +381,7 @@ class Ladderbot(commands.Cog):
         Output:
             Team Bravo has had a win taken away by an Administrator. They now have 5 wins.
         """
+        logger.info(f'Command "subtract_win" invoked by {ctx.author} with team_name={team_name}')
         result = self.ladder_manager.subtract_win(team_name)
         await ctx.send(result)
 
@@ -389,6 +405,7 @@ class Ladderbot(commands.Cog):
         Output:
             Team Delta has been given a loss by an Administrator.
         """
+        logger.info(f'Command "add_loss" invoked by {ctx.author} with team_name={team_name}')
         result = self.ladder_manager.add_loss(team_name)
         await ctx.send(result)
 
@@ -412,6 +429,7 @@ class Ladderbot(commands.Cog):
         Output:
             Team Charlie has had a loss taken away by an Administrator. They now have 2 losses.
         """
+        logger.info(f'Command "subtract_loss" invoked by {ctx.author} with team_name={team_name}')
         result = self.ladder_manager.subtract_loss(team_name)
         await ctx.send(result)
     
@@ -431,6 +449,7 @@ class Ladderbot(commands.Cog):
 
         Output: Formatted table of the standings in the given division
         """
+        logger.info(f'Command "post_standings" invoked by {ctx.author} with division_type={division_type}')
         result = await self.ladder_manager.post_standings(division_type)
         await ctx.send(result)
 
@@ -450,6 +469,7 @@ class Ladderbot(commands.Cog):
 
         Output: Formatted table of the current challenges in the given division
         """
+        logger.info(f'Command "post_challenges" invoked by {ctx.author} with division_type={division_type}')
         result = self.ladder_manager.post_challenges(division_type)
         await ctx.send(result)
     
@@ -472,6 +492,7 @@ class Ladderbot(commands.Cog):
         Output:
             The 1v1 standings channel has been set to #1v1-standings
         """
+        logger.info(f'Command "set_standings_channel" invoked by {ctx.author} with division_type={division_type} channel={channel}')
         result = await self.ladder_manager.set_standings_channel(division_type, channel)
         await ctx.send(result)
 
@@ -495,6 +516,7 @@ class Ladderbot(commands.Cog):
         Output:
             The standings channel for the 3v3 division has been cleared.
         """
+        logger.info(f'Command "clear_standings_channel" invoked by {ctx.author} with division_type={division_type}')
         result = self.ladder_manager.clear_standings_channel(division_type)
         await ctx.send(result)
     
@@ -520,6 +542,7 @@ class Ladderbot(commands.Cog):
         Output:
             The 2v2 challenges channel has been set to #2v2-challenges
         """
+        logger.info(f'Command "set_challenges_channel" invoked by {ctx.author} with division_type={division_type} channel={channel}')
         result = await self.ladder_manager.set_challenges_channel(division_type, channel)
         await ctx.send(result)
     
@@ -543,6 +566,7 @@ class Ladderbot(commands.Cog):
         Output:
             The challenges channel for the 1v1 division has been cleared.
         """
+        logger.info(f'Command "clear_challenges_channel" invoked by {ctx.author} with division_type={division_type}')
         result = self.ladder_manager.clear_challenges_channel(division_type)
         await ctx.send(result)
 
@@ -562,7 +586,7 @@ class Ladderbot(commands.Cog):
 
         Output: A link to the bot's documentation.
         """
-        
+        logger.info(f'Command "show_help" invoked by {ctx.author}')
         help_text = """
         📖 **For more detailed information, refer to the bot's documentation.**
         ** https://github.com/Theinfection91/Ladderbot3.0/blob/main/Ladderbot3Doc.md ** 📖
