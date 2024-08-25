@@ -1,5 +1,8 @@
 ## Overview
-**Ladderbot3.0** is a versatile Discord bot designed to manage and facilitate competitive ladder systems for teams within various divisions. This bot leverages the `LadderManager` class to interact with the underlying database, enabling a range of functionalities through Discord commands. 
+**Ladderbot3.0** is a versatile Discord bot designed to manage and facilitate competitive ladder systems for teams within various divisions. This bot leverages the `LadderManager` class to interact with the underlying database, enabling a range of functionalities through Discord commands which the bot handles by using a variety of helper or validator functions and methods. This is still a work in progress but overall it is stable and functions even better than my previous 2.0 version. Below you will find it's current features and also a list of things to come that I am currently creating ideas for or already working on. Thank you for your time and interest in this project, I have just started learning Python and programming in general over the last year and am excited to share my work and also keep learning as much as possible in the process. You can submit issues in the issues tab or message me on Discord at `Theinfection1991`.
+
+### **Refer to Ladderbot3.0 Documentation for more in-depth information on all commands:** 
+- **https://github.com/Theinfection91/Ladderbot3.0/blob/main/Ladderbot3Doc.md**
 
 ### Key Features:
 
@@ -10,8 +13,12 @@
 - **Standings and Challenges**: Post current standings and challenges in specific channels, with options to set channels for automatic updates.
 - **Administrative Controls**: Admins have extended functionalities to manually adjust team ranks, wins, and losses.
 
-**REFER TO BOT DOCUMENTATION FOR MORE IN-DEPTH INFO:** 
-- https://github.com/Theinfection91/Ladderbot3.0/blob/main/Ladderbot3Doc.md
+### Things to Come:
+
+- **Teams Channels**: Ways of displaying teams and all of their members into a specific channel for a given division, like how standings and challenges channels currently work.
+- **Logging System**: A way of saving log files to text of the tournament activities, commands, etc. and also a way to parse and have the bot read it back by giving it certain commands. This will make use of Python's builtin logging module.
+- **Improved Error Handling**: More error messages when forgetting a parameter or using the wrong one. Currently some commands will not generate a response if used incorrectly, and even though nothing is happening in the backend it can worry the user that some data may have changed and they can't be sure because the bot didn't say anything.
+- **Open To New Ideas**: If you have any unique and creative ideas, or even a little one or tiny tweak you think would work well with this tournament manager, then please do not hesitate to let me know. I'm very open to new ideas as I really love doing this, but sometimes I work better when being asked to create something rather than trying to figure one out on my own.
 
 # Discord Bot Token Usage
 
