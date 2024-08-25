@@ -95,7 +95,7 @@ For more detailed usage and examples of each command, please refer to the specif
 
 ### Setting the Challenges Channel
 - **Command:** `/set_challenges_channel <division_type> <#channel>`
-- **Description:** Sets the given division channel where challenge notifications will be posted.
+- **Description:** Sets the given division channel where challenge notifications will be periodically updated.
 - **Parameters:**
   - `<#channel>`: The channel for challenge notifications.
   - `<division_type>`: The division of challenges for the channel
@@ -150,7 +150,7 @@ For more detailed usage and examples of each command, please refer to the specif
 
 ### Setting the Standings Channel
 - **Command:** `/set_standings_channel <division_type> <#channel>`
-- **Description:** Sets the channel where standings will be posted for given division type.
+- **Description:** Sets the channel where standings will be periodically updated for given division type.
 - **Parameters:**
   - `<#channel>`: The channel for standings updates.
   - `<division_type>`: The specific division of standings for the channel
@@ -165,6 +165,25 @@ For more detailed usage and examples of each command, please refer to the specif
   - `<division_type>`: The specific division of standings channel to clear
 - **Example:** `/clear_standings_channel 3v3`
 - **Response:** Confirms the standings channel ID was cleared for given division.
+- **Permissions:** Admin only.
+
+### Setting the Teams Channel
+- **Command:** `/set_teams_channel <division_type> <#channel>`
+- **Description:** Sets the channel where teams will be periodically updated for given division type.
+- **Parameters:**
+  - `<#channel>`: The channel for standings updates.
+  - `<division_type>`: The specific division of standings for the channel
+- **Example:** `/set_teams_channel 3v3 #3v3-teams`
+- **Response:** Confirms the new teams channel and division type.
+- **Permissions:** Admin only.
+
+### Clearing the Teams Channel
+- **Command:** `/clear_teams_channel <division_type>`
+- **Description:** Clears the channel designated for teams updates for given division.
+- **Parameters:**
+  - `<division_type>`: The specific division of standings channel to clear
+- **Example:** `/clear_teams_channel 3v3`
+- **Response:** Confirms the teams channel ID was cleared for given division.
 - **Permissions:** Admin only.
 
 ### Adjusting Team Rank
