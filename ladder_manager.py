@@ -41,6 +41,7 @@ class LadderManager:
     def create_test_teams(self, division_type: str) -> str:
 
         if not is_valid_division_type(division_type):
+            logger.error(f'LadderManager: Wrong division type given for "create_test_teams". User entered: {division_type}')
             return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. ❌"
 
 
@@ -102,6 +103,7 @@ class LadderManager:
         Start the ladder for a given division type.
         """
         if not is_valid_division_type(division_type):
+            logger.error(f'LadderManager: Wrong division type given for "start_ladder". User entered: {division_type}')
             return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. ❌"
         
         if is_ladder_running(division_type):
@@ -116,6 +118,7 @@ class LadderManager:
         """
         # Check if correct division type was entered
         if not is_valid_division_type(division_type):
+            logger.error(f'LadderManager: Wrong division type given for "end_ladder". User entered: {division_type}')
             return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. ❌"
 
         if not is_ladder_running(division_type):
@@ -160,7 +163,8 @@ class LadderManager:
                     for member_display_name in member_display_names:
                         
                         # If a player is already registered on a team in a given division type the process is stopped
-                        if is_member_registered(division_type, member_display_name):     
+                        if is_member_registered(division_type, member_display_name):
+                            logger.error(f'LadderManager: Member already found on team in given division type. User entered: division_type={division_type} conflicting_member={member_display_name}')     
                             return f"{member_display_name} is already registered on a team in the {division_type} division. Please try again."
                     
                     # NOTE :----------------------------------------
@@ -172,15 +176,20 @@ class LadderManager:
                     db_register_team(division_type, team_name, members_string)
 
                     # Return confirmation message
+                    logger.info(f'LadderManager: Successfully created new team with following parameters: team_name={team_name} division_type={division_type} members={members_string}')
                     return f"🎖️ Team {team_name} has been registered in the {division_type} division with the following members: {members_string} 🎖️"
                 
                 else:
+                    members_list = [member.display_name for member in members]
+                    logger.error(f'LadderManager: Wrong amount of members given for division type. User entered: division_type={division_type} members={members_list}')
                     return "❌ Please enter the correct amount of members depending on the division type. ❌"
                 
             else:
+                logger.error(f'LadderManager: Wrong division type given for "register_team". User entered: {division_type}')
                 return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. ❌"
             
         else:
+            logger.error(f'LadderManager: team_name already found in database for "register_team". User entered: {team_name}')
             return f"❌ Team {team_name} is already being used. Please choose another team name. ❌"
         
     def remove_team(self, team_name):
@@ -190,12 +199,14 @@ class LadderManager:
         """
         # See if team exists in the database
         if not does_team_exist(team_name):
+            logger.error(f'LadderManager: No team with given team_name found in database for "remove_team". User entered: {team_name}')
             return f"❌ No team found by the name of {team_name}. Please try again. ❌"
         
         # If team exists grab the division they are in
         division_type = check_team_division(team_name)
 
         db_remove_team(division_type, team_name)
+        logger.info(f'LadderManager: Successfully removed team from {division_type} division with following parameters: team_name={team_name}')
         return f"🛑 Team {team_name} from the {division_type} division has been removed from the Ladder. 🛑"
 
     async def get_member_id_from_display_names(self, guild: discord.Guild, members_string: str):
@@ -239,10 +250,13 @@ class LadderManager:
             if member is not None:
                 try:
                     # If member is found, send a message displaying who challenged them
+                    logger.info(f'LadderManager: Successfully sent challenge notification using parameters: challenger_team={challenger_team} challenged_team={challenged_team} | Sent notification to: members={members_string}')
                     await member.send(f"⚔️ Your team, Team {challenged_team}, has been challenged by Team {challenger_team} in the {division_type} division! ⚔️")
                 except discord.Forbidden:
+                    logger.error(f"Could not send a message to {member} (ID: {member_id}).")
                     print(f"Could not send a message to {member} (ID: {member_id}).")
             else:
+                logger.error(f"LadderManager: Member with ID {member_id} not found.")
                 print(f"Member with ID {member_id} not found.")
 
     async def challenge(self, ctx, challenger_team: str, challenged_team: str):
@@ -255,9 +269,11 @@ class LadderManager:
         """
         # Check if both teams exist
         if not does_team_exist(challenger_team):
+            logger.error(f'LadderManager: No challenger team found for "challenge". User entered: challenger_team={challenger_team}')
             return f"❌ No team found by the name of {challenger_team}. Please try again. ❌"
         
         if not does_team_exist(challenged_team):
+            logger.error(f'LadderManager: No challenged team found for "challenge". User entered: challenged_team={challenged_team}')
             return f"❌ No team found by the name of {challenged_team}. Please try again. ❌"
         
         # Capture the author of the command call's display name
@@ -265,6 +281,7 @@ class LadderManager:
 
         # Check if the person calling the command is apart of the challenger team
         if not is_member_on_team(display_name, challenger_team):
+            logger.error(f'LadderManager: User invoking command "challenge" is not part of challenger team. User entered: challenger_team={challenger_team} User: {display_name}')
             return f"❌ You are not a member of Team {challenger_team} and may not issue a challenge on their behalf. ❌"
         
         # Check if both teams exist within the same division and stores which divison if so
@@ -272,6 +289,7 @@ class LadderManager:
         challenged_division = check_team_division(challenged_team)
         
         if challenger_division != challenged_division:
+            logger.error(f'LadderManager: User entered two teams that are not in the same division. User entered: challenger_team={challenger_team} challenger_team_division={challenger_division} | challenged_team={challenged_team} challenged_team_division={challenged_division}')
             return f"❌ Team {challenger_team} and Team {challenged_team} are not in the same division... ❌"
         
         # Set division type to use for helper functions
@@ -279,6 +297,7 @@ class LadderManager:
         
         # Check if the ladder is running in the given division type
         if not is_ladder_running(division_type):
+            logger.error(f'LadderManager: The ladder is not currently running on the given division_type. User entered: {division_type}')
             return f"❌ The {division_type} division of the ladder has not started yet... Please wait to send challenges. ❌"
         
         # Grab the rank of each team for comparison
@@ -287,17 +306,22 @@ class LadderManager:
 
         # Check if the challenging team is challenging either one or two ranks above them
         if challenged_rank > challenger_rank or challenged_rank <= challenger_rank - 3:
+            logger.error(f'LadderManager: Teams can only challenge other teams up to two ranks above their current rank. Parameters used: challenger_rank={challenger_rank} challenged_rank={challenged_rank}')
             return f"❌ Teams can only challenge other teams up to two ranks above their current rank. ❌"
         
         # Check if either team has challenged or already been challenged
         if is_team_challenged(division_type, challenged_team):
+            logger.error(f'LadderManager: Challenged team has already been challenged. User entered: challenged_team={challenged_team}')
             return f"❌ {challenged_team} has already been challenged by another team and must complete that match first! ❌"
         if has_team_challenged(division_type, challenged_team):
+            logger.error(f'LadderManager: Challenged team has already sent out a challenge. User entered: challenged_team={challenged_team}')
             return f"❌ {challenged_team} has already sent out a challenge to a team and must complete that match first! ❌"
         
         if is_team_challenged(division_type, challenger_team):
+            logger.error(f'LadderManager: Challenger team has already been challenged. User entered: challenger_team={challenger_team}')
             return f"❌ {challenger_team} has already been challenged by another team and must complete that match first! ❌"
         if has_team_challenged(division_type, challenger_team):
+            logger.error(f'LadderManager: Challenger team has already sent out a challenge. User entered: challenger_team={challenger_team}')
             return f"❌ {challenger_team} has already sent out a challenge to a team and must complete that match first! ❌"
         
         # Once all checks are passed then register the challenge in the correct table
@@ -305,7 +329,7 @@ class LadderManager:
 
         # Send a notificaiton to members in challenged team
         await self.send_challenge_notification(ctx, challenger_team, challenged_team)
-
+        logger.info(f"LadderManager: A challenge in the {division_type} divison has been created between Team {challenger_team} with rank {challenger_rank} as the challenger and Team {challenged_team} with rank {challenged_rank} as the challenged team.")
         return f"⚔️ Team {challenger_team} has challenged Team {challenged_team} in the {division_type} division! ⚔️"
     
     def cancel_challenge(self, ctx, challenger_team: str):
@@ -320,6 +344,7 @@ class LadderManager:
         """
         # Check if given team exists in the database
         if not does_team_exist(challenger_team):
+            logger.error(f'LadderManager: No challenger team found for "cancel_challenge". User entered: challenger_team={challenger_team}')
             return f"❌ No Team found by the name of {challenger_team}. Please try again. ❌"
         
         # Capture the author of the command call's display name and team division
@@ -328,14 +353,17 @@ class LadderManager:
         
         # Check if the person calling the command is apart of the challenger team
         if not is_member_on_team(display_name, challenger_team):
+            logger.error(f'LadderManager: User invoking command "cancel_challenge" is not part of challenger team. User entered: challenger_team={challenger_team} User: {display_name}')
             return f"❌ You are not a member of Team {challenger_team}. ❌"
 
         # Check if the given team has sent out a challenge
         if not has_team_challenged(team_division, challenger_team):
+            logger.error(f'LadderManager: Challenger team has not sent out a challenge to cancel. User entered: challenger_team={challenger_team}')
             return f"❌ No challenge was found where Team {challenger_team} was the Challenger. Please try again. ❌"
         
         # If all checks are passed, delete the specified challenge from correct challenges table
         db_remove_challenge(team_division, challenger_team)
+        logger.info(f"LadderManager: Successfully canceled the challenge made by {challenger_team} in the {team_division} division by {display_name}.")
         return f"🚩 The challenge made by Team {challenger_team} in the {team_division} division has been canceled by a team member. 🚩"
     
     def admin_challenge(self, challenger_team: str, challenged_team: str):
@@ -346,9 +374,11 @@ class LadderManager:
         """
         # Check if both teams exist
         if not does_team_exist(challenger_team):
+            logger.error(f'LadderManager: No challenger team found for "admin_challenge". User entered: challenger_team={challenger_team}')
             return f"❌ No team found by the name of {challenger_team}. Please try again. ❌"
         
         if not does_team_exist(challenged_team):
+            logger.error(f'LadderManager: No challenged team found for "admin_challenge". User entered: challenged_team={challenged_team}')
             return f"❌ No team found by the name of {challenged_team}. Please try again. ❌"
         
         # Check if both teams exist within the same division and stores which divison if so
@@ -356,6 +386,7 @@ class LadderManager:
         challenged_division = check_team_division(challenged_team)
         
         if challenger_division != challenged_division:
+            logger.error(f'LadderManager: User entered two teams that are not in the same division. User entered: challenger_team={challenger_team} challenger_team_division={challenger_division} | challenged_team={challenged_team} challenged_team_division={challenged_division}')
             return f"❌ Team {challenger_team} and Team {challenged_team} are not in the same division... ❌"
         
         # Set division type to use for helper functions
@@ -363,6 +394,7 @@ class LadderManager:
 
         # Check if the ladder is running in the given division type
         if not is_ladder_running(division_type):
+            logger.error(f'LadderManager: The ladder is not currently running on the given division_type. User entered: {division_type}')
             return f"❌ The {division_type} division of the ladder has not started yet... Please wait to send challenges. ❌"
         
         # Grab the rank of each team for comparison
@@ -371,21 +403,27 @@ class LadderManager:
 
         # Check if the challenging team is challenging either one or two ranks above them
         if challenged_rank > challenger_rank or challenged_rank <= challenger_rank - 3:
+            logger.error(f'LadderManager: Teams can only challenge other teams up to two ranks above their current rank. Parameters used: challenger_rank={challenger_rank} challenged_rank={challenged_rank}')
             return f"❌ Teams can only challenge other teams up to two ranks above their current rank. ❌"
         
         # Check if either team has challenged or already been challenged
         if is_team_challenged(division_type, challenged_team):
+            logger.error(f'LadderManager: Challenged team has already been challenged. User entered: challenged_team={challenged_team}')
             return f"❌ {challenged_team} has already been challenged by another team and must complete that match first! ❌"
         if has_team_challenged(division_type, challenged_team):
+            logger.error(f'LadderManager: Challenged team has already sent out a challenge. User entered: challenged_team={challenged_team}')
             return f"❌ {challenged_team} has already sent out a challenge to a team and must complete that match first! ❌"
         
         if is_team_challenged(division_type, challenger_team):
+            logger.error(f'LadderManager: Challenger team has already been challenged. User entered: challenger_team={challenger_team}')
             return f"❌ {challenger_team} has already been challenged by another team and must complete that match first! ❌"
         if has_team_challenged(division_type, challenger_team):
+            logger.error(f'LadderManager: Challenger team has already sent out a challenge. User entered: challenger_team={challenger_team}')
             return f"❌ {challenger_team} has already sent out a challenge to a team and must complete that match first! ❌"
         
         # Once all checks are passed then register the challenge in the correct table
         db_register_challenge(division_type, challenger_team, challenged_team)
+        logger.info(f"LadderManager: A challenge in the {division_type} divison has been created between Team {challenger_team} with rank {challenger_rank} as the challenger and Team {challenged_team} with rank {challenged_rank} as the challenged team.")
         return f"⚔️ Team {challenger_team} has challenged Team {challenged_team} in the {division_type} division! ⚔️ -This challenge was created by an Administrator."
     
     def admin_cancel_challenge(self, challenger_team: str):
@@ -396,6 +434,7 @@ class LadderManager:
         """
         # Check if given team exists in the database
         if not does_team_exist(challenger_team):
+            logger.error(f'LadderManager: No challenger team found for "admin_cancel_challenge". User entered: challenger_team={challenger_team}')
             return f"❌ No Team found by the name of {challenger_team}. Please try again. ❌"
         
         # Capture the team division of the challenger team
@@ -403,10 +442,12 @@ class LadderManager:
 
         # Check if the given team has sent out a challenge
         if not has_team_challenged(team_division, challenger_team):
+            logger.error(f'LadderManager: Challenger team has not sent out a challenge to cancel. User entered: challenger_team={challenger_team}')
             return f"❌ No challenge was found where Team {challenger_team} was the Challenger. Please try again. ❌"
         
         # If all checks are passed, delete the specified challenge from correct challenges table
         db_remove_challenge(team_division, challenger_team)
+        logger.info(f"LadderManager: Successfully canceled the challenge made by {challenger_team} in the {team_division} division by an Admin.")
         return f"🚩 The challenge made by Team {challenger_team} in the {team_division} division has been canceled by an Administrator. 🚩"
     
     def report_win(self, ctx, winning_team: str):
