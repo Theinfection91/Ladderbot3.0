@@ -5,7 +5,7 @@
 - **https://github.com/Theinfection91/Ladderbot3.0/blob/main/Ladderbot3Doc.md**
 
 ### Key Features:
-- **Teams Channels (INTRODUCED AND IN-PROGESS)**: You can now use ```/post_teams <division_type>``` to have the bot spit out a table similar to challenges and standings of the teams in that division and their member(s). Soon there will be a way of displaying teams and all of their members into a specific channel for a given division, like how standings and challenges channels currently work.
+- **Teams Channels (DONE)**: You can now use ```/post_teams <division_type>``` to have the bot spit out a table similar to challenges and standings of the teams in that division and their member(s). Also now with ```/set_teams_channel <division_type>``` you can display teams and all of their members into a specific channel for a given division and have it stay updated just like how standings and challenges channels currently work.
 - **Logging System (INTRODUCED AND IN-PROGESS)**: Have access to a ladderbot.log file in the logs folder that will keep track of command invokes by every user, show what parameters were being passed through methods, and allow a way to visually see and keep track of errors. This is still being implemented through out the program, and may eventually lead to having commands in the bot to show and filter certain aspects of the log files within a certain given parameters. The log files are set to begin removing data at 5MB and will hold a maximum of 5 back up copies of the log.
 - **Ladder Management**: Start and end ladders for specific divisions (1v1, 2v2, 3v3) with administrative commands.
 - **Team Management**: Admins can register and remove teams from each specific division of ladder
