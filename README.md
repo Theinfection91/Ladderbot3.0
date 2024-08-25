@@ -10,6 +10,9 @@
 - **Standings and Challenges**: Post current standings and challenges in specific channels, with options to set channels for automatic updates.
 - **Administrative Controls**: Admins have extended functionalities to manually adjust team ranks, wins, and losses.
 
+**REFER TO BOT DOCUMENTATION FOR MORE IN-DEPTH INFO:** 
+- https://github.com/Theinfection91/Ladderbot3.0/blob/main/Ladderbot3Doc.md
+
 # Discord Bot Token Usage
 
 To properly use the Discord bot token with your program, you have two options: manually entering the token directly in the code or using a separate Python file to import the token.
