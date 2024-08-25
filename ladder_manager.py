@@ -36,7 +36,7 @@ class LadderManager:
         self.periodic_update_standings.start()
         self.periodic_update_challenges.start()
 
-    def create_test_teams(self, division_type):
+    def create_test_teams(self, division_type: str) -> str:
         
         if not is_valid_division_type(division_type):
             return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. ❌"
@@ -93,9 +93,9 @@ class LadderManager:
                     await self.update_standings_message(division_type, standings_channel)
                     self.periodic_update_standings.start()
     
-    def start_ladder(self, division_type):
+    def start_ladder(self, division_type: str) -> str:
         """
-        
+        Start the ladder for a given division type.
         """
         if not is_valid_division_type(division_type):
             return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. ❌"
@@ -106,9 +106,9 @@ class LadderManager:
         set_ladder_running(division_type, True)
         return f"🔥 The {division_type} division of the ladder has started! 🔥"
     
-    def end_ladder(self, division_type):
+    async def end_ladder(self, division_type):
         """
-        
+        End the ladder for a given division type.
         """
         # Check if correct division type was entered
         if not is_valid_division_type(division_type):
@@ -117,6 +117,8 @@ class LadderManager:
         if not is_ladder_running(division_type):
             return f"❌ The {division_type} division of the ladder is not currently running... ❌"
         
+        final_standings = await self.post_standings(division_type)
+        
         # Set ladder running to False for given division
         set_ladder_running(division_type, False)
 
@@ -124,7 +126,9 @@ class LadderManager:
         db_clear_all_challenges(division_type)
         db_clear_all_teams(division_type)
 
-        return f"💥 The {division_type} division of the ladder has ended! 💥"
+        end_ladder_message = f"\t\t💥 The {division_type} division of the ladder has ended! 💥\n\n"
+        end_ladder_message += final_standings
+        return end_ladder_message
 
     def register_team(self, division_type: str, team_name: str, *members: discord.Member):
         """

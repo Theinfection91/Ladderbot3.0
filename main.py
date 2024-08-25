@@ -97,7 +97,7 @@ class Ladderbot(commands.Cog):
         Output:
             The 2v2 division of the ladder has ended!.
         """
-        result = self.ladder_manager.end_ladder(division_type)
+        result = await self.ladder_manager.end_ladder(division_type)
         await ctx.send(result)
     
     @commands.command()
