@@ -37,8 +37,21 @@ class Ladderbot(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def start_ladder(self, ctx, division_type: str):
         """
-        Method for starting the ladder in
-        a given division type
+        Starts the ladder in a given division type.
+
+        This command will start the ladder in the given division type.
+        The ladder will be started with the teams that are currently
+        registered in the division.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            division_type (str): The type of the division (1v1, 2v2, or 3v3).
+
+        Example:
+            /start_ladder 1v1
+
+        Output:
+            The ladder in the 1v1 division has been started.
         """
         result = self.ladder_manager.start_ladder(division_type)
         await ctx.send(result)
@@ -47,7 +60,19 @@ class Ladderbot(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def create_test_teams(self, ctx, division_type: str):
         """
-        Create 5 test teams fast for debugging
+        Creates 5 test teams fast for debugging purposes.
+
+        This command will create 5 test teams in the given division type.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            division_type (str): The type of the division (1v1, 2v2, or 3v3).
+
+        Example:
+            /create_test_teams 1v1
+
+        Output:
+            5 test teams have been created in the 1v1 division.
         """
         result = self.ladder_manager.create_test_teams(division_type)
         await ctx.send(result)
@@ -56,8 +81,21 @@ class Ladderbot(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def end_ladder(self, ctx, division_type: str):
         """
-        Method for ending the ladder in
-        a given division type
+        Ends the ladder in a given division type.
+
+        This command will end the ladder in the given division type.
+        The ladder will be ended with the teams that are currently
+        registered in the division.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            division_type (str): The type of the division (1v1, 2v2, or 3v3).
+
+        Example:
+            /end_ladder 2v2
+
+        Output:
+            The 2v2 division of the ladder has ended!.
         """
         result = self.ladder_manager.end_ladder(division_type)
         await ctx.send(result)
@@ -67,6 +105,13 @@ class Ladderbot(commands.Cog):
     async def register_team(self, ctx, team_name: str,  division_type: str, *members: discord.Member):
         """
         Registers a new team within a specified division.
+        
+        NOTE: Team names are unique across the entire program,
+        meaning if there is a Team Alpha in the 2v2 division then
+        the program will now allow a Team Alpha to be created in the
+        1v1 or 3v3 division. By having team names unique this way it 
+        reduces the need for inputting division type on some commands
+        like remove_team, challenges, and report_wins.
 
         Args:
             ctx (discord.ext.commands.Context): The context of the command.
@@ -87,18 +132,21 @@ class Ladderbot(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def remove_team(self, ctx, team_name: str):
         """
-        Removes a team within a specifed division
+        Removes a team from the entire ladder
+
+        This command will remove the team with the given name from the
+        the entire ladder. Note that this command is only available to
+        administrators.
 
         Args:
             ctx (discord.ext.commands.Context): The context of the command.
             team_name (str): The name of the team.
-            division_type (str): The type of the division (1v1, 2v2, or 3v3).
 
         Example:
-            /remove_team Delta 1v1
+            /remove_team Delta
 
         Output:
-            Team Delta from the 1v1 division has been removed from the Ladder.
+            Team Delta from the 3v3 division has been removed from the Ladder.
         """
         result = self.ladder_manager.remove_team(team_name)
         await ctx.send(result)
@@ -109,7 +157,21 @@ class Ladderbot(commands.Cog):
         This challenge function will be usable by everyone
         and users will not need to specify which division
         since team names are set to be unique across
-        all divisions (Cant have a Team Alpha in 1v1 and Team Alpha in 2v2)
+        all divisions (Cant have a Team Charlie in 1v1 and Team Charlie in 2v2)
+
+        A team may only challenge at most two ranks above their rank,
+        and no team may challenge below their rank.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            challenger_team (str): The name of the team that is challenging.
+            challenged_team (str): The name of the team that is being challenged.
+
+        Example:
+            /challenge Echo Delta
+
+        Output:
+            Team Echo has challenged Team Delta in the 3v3 division!
         """
         result = await self.ladder_manager.challenge(ctx, challenger_team, challenged_team)
         await ctx.send(result)
@@ -118,6 +180,16 @@ class Ladderbot(commands.Cog):
     async def cancel_challenge(self, ctx, challenger_team: str):
         """
         Will cancel the challenge of a given challenger team
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            challenger_team (str): The name of the team that is cancelling the challenge.
+
+        Example:
+            /cancel_challenge Echo
+
+        Output:
+            The challenge made by Team Echo in the 3v3 division has been canceled by a team member.
         """
         result = self.ladder_manager.cancel_challenge(ctx, challenger_team)
         await ctx.send(result)
@@ -127,7 +199,20 @@ class Ladderbot(commands.Cog):
     async def admin_challenge(self, ctx, challenger_team: str, challenged_team: str):
         """
         Admin method for manually creating challenges
-        between teams
+        between teams. This can be useful for when a
+        challenge needs to be re-created due to a technical
+        issue.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            challenger_team (str): The name of the team that is challenging.
+            challenged_team (str): The name of the team that is being challenged.
+
+        Example:
+            /admin_challenge Echo Delta
+
+        Output:
+            Team Echo has challenged Team Delta in the 3v3 division!. -This challenge was created by an Administrator.
         """
         result = self.ladder_manager.admin_challenge(challenger_team, challenged_team)
         await ctx.send(result)
@@ -138,6 +223,20 @@ class Ladderbot(commands.Cog):
         """
         Admin method for manually cancelling challenges
         between teams
+
+        This command can be used to cancel a challenge that has already been
+        created. This can be useful for when a challenge needs to be removed
+        due to a technical issue.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            challenger_team (str): The name of the team that made the challenge.
+
+        Example:
+            /admin_cancel_challenge Echo
+
+        Output:
+            The challenge made by Team Echo in the 3v3 division has been canceled by an Administrator.
         """
         result = self.ladder_manager.admin_cancel_challenge(challenger_team)
         await ctx.send(result)
@@ -147,6 +246,26 @@ class Ladderbot(commands.Cog):
         """
         Command for all users to report who won
         their match between the challenger and challenged team.
+
+        Rank change will occur if the winning team was the challenger
+        with the challenger team moving at most two ranks up, and the 
+        challenged team will always only move one spot down. 
+        If the winning team was the challenged team, no rank changes will occur.
+        
+        Example: If Bravo Rank 5 challenges and beats Alpha Rank 3, they become Bravo 3
+        and Alpha 4. A "swap" would occur if the teams are directly above and below
+        each other in the standings by rank.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            winning_team (str): The name of the team that won the match.
+
+        Example:
+            /report_win Echo
+
+        Output:
+            Team Echo has won the match and taken the rank of Team Delta! Team Delta moves down one in the ranks.
+            Team Delta has won the match against Team Echo, but no rank changes occur since Team Delta was the challenged team.
         """
         result = self.ladder_manager.report_win(ctx, winning_team)
         await ctx.send(result)
@@ -155,8 +274,20 @@ class Ladderbot(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def admin_report_win(self, ctx, winning_team):
         """
-        Command for Admins only to report who won
-        a match, giving the winning team just like report_win
+        This command works exactly like report_win, but is available only to
+        administrators. This command is useful for when an administrator needs
+        to manually edit the standings of a division for any reason.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            winning_team (str): The name of the team that won the match.
+
+        Example:
+            /admin_report_win Echo
+
+        Output:
+            Team Charlie has won the match and taken the rank of Team Alpha! Team Alpha moves down one in the ranks. This report was made by an Administrator.
+            Team Alpha has won the match against Team Charlie, but no rank changes occur since Team Alpha was the challenged team. This report was made by an Administrator.
         """
         result = self.ladder_manager.admin_report_win(winning_team)
         await ctx.send(result)
@@ -168,6 +299,21 @@ class Ladderbot(commands.Cog):
         Admin method for manually changing
         the rank a given team and adjusting
         the other teams ranks accordingly.
+
+        This command is useful for when a team needs to be moved to a
+        specific rank, for example, if a team needs to be moved to the top
+        of the ladder.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            team_name (str): The name of the team to have its rank changed.
+            new_rank (int): The new rank of the given team.
+
+        Example:
+            /set_rank Alpha 1
+
+        Output:
+            Team Alpha has been assigned to the rank of 1 in the 1v1 division.
         """
         result = self.ladder_manager.set_rank(team_name, new_rank)
         await ctx.send(result)
@@ -178,6 +324,19 @@ class Ladderbot(commands.Cog):
         """
         Admin method to manually increment
         ONE win to the given team
+
+        This command is useful for when a team needs to be given a win
+        for a match due to technical error.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            team_name (str): The name of the team to have its win count incremented.
+
+        Example:
+            /add_win Alpha
+
+        Output:
+            Team Alpha has been given a win by an Administrator.
         """
         result = self.ladder_manager.add_win(team_name)
         await ctx.send(result)
@@ -188,6 +347,19 @@ class Ladderbot(commands.Cog):
         """
         Admin method to manually decrement
         ONE win to the given team
+
+        This command is useful for when a team needs to have a win
+        revoked due to technical error.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            team_name (str): The name of the team to have its win count decremented.
+
+        Example:
+            /subtract_win Alpha
+
+        Output:
+            Team Bravo has had a win taken away by an Administrator. They now have 5 wins.
         """
         result = self.ladder_manager.subtract_win(team_name)
         await ctx.send(result)
@@ -198,6 +370,19 @@ class Ladderbot(commands.Cog):
         """
         Admin method to manually increment
         ONE loss to the given team
+
+        This command is useful for when a team needs to be given a loss
+        for a match due to technical error.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            team_name (str): The name of the team to have its loss count incremented.
+
+        Example:
+            /add_loss Delta
+
+        Output:
+            Team Delta has been given a loss by an Administrator.
         """
         result = self.ladder_manager.add_loss(team_name)
         await ctx.send(result)
@@ -208,6 +393,19 @@ class Ladderbot(commands.Cog):
         """
         Admin method to manually decrement
         ONE loss to the given team
+
+        This command is useful for when a team needs to have a loss
+        removed due to technical error.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            team_name (str): The name of the team to have its loss count decremented.
+
+        Example:
+            /subtract_loss Delta
+
+        Output:
+            Team Charlie has had a loss taken away by an Administrator. They now have 2 losses.
         """
         result = self.ladder_manager.subtract_loss(team_name)
         await ctx.send(result)
@@ -215,10 +413,18 @@ class Ladderbot(commands.Cog):
     @commands.command()
     async def post_standings(self, ctx, division_type: str):
         """
-        Command usable by all users to
-        post the current standings of a given
-        division type into the channel this
-        was called from.
+        This command is useful for when a user wants to quickly
+        see the current standings of a division without needing
+        to go to the #standings channel.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            division_type (str): The type of the division (1v1, 2v2, or 3v3).
+
+        Example:
+            /post_standings 1v1
+
+        Output: Formatted table of the standings in the given division
         """
         result = await self.ladder_manager.post_standings(division_type)
         await ctx.send(result)
@@ -226,10 +432,18 @@ class Ladderbot(commands.Cog):
     @commands.command()
     async def post_challenges(self, ctx, division_type: str):
         """
-        Command for everyone to post
-        the current challenges for a given 
-        division type into the channel
-        this was called from.
+        This command is useful for when a user wants to quickly
+        see the current challenges of a division without needing
+        to go to the #challenges channel.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            division_type (str): The type of the division (1v1, 2v2, or 3v3).
+
+        Example:
+            /post_challenges 1v1
+
+        Output: Formatted table of the current challenges in the given division
         """
         result = self.ladder_manager.post_challenges(division_type)
         await ctx.send(result)
@@ -240,7 +454,18 @@ class Ladderbot(commands.Cog):
         """
         Admin command to set the updating
         standings board to specified channel
-        for the given division type
+        for the given division type.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            division_type (str): The type of the division (1v1, 2v2, or 3v3).
+            channel (discord.TextChannel): The channel to which the standings board will be posted.
+
+        Example:
+            /set_standings_channel 1v1 #1v1-standings
+
+        Output:
+            The 1v1 standings channel has been set to #1v1-standings
         """
         result = await self.ladder_manager.set_standings_channel(division_type, channel)
         await ctx.send(result)
@@ -251,6 +476,19 @@ class Ladderbot(commands.Cog):
         """
         Admin method to clear a division's standings
         channel that has been set
+
+        This command is useful for when an admin want to remove
+        the standings channel for a division.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            division_type (str): The type of the division (1v1, 2v2, or 3v3).
+
+        Example:
+            /clear_standings_channel 3v3
+
+        Output:
+            The standings channel for the 3v3 division has been cleared.
         """
         result = self.ladder_manager.clear_standings_channel(division_type)
         await ctx.send(result)
@@ -260,10 +498,23 @@ class Ladderbot(commands.Cog):
     async def set_challenges_channel(self, ctx, division_type: str, channel: discord.TextChannel):
         """
         Admin method to set the updating
-        standings board to specified channel
-        for the given division type
-        """
+        challenges channel to specified channel
+        for the given division type.
 
+        This command is useful for when an admin want to set
+        the channel that the challenges will be posted to.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            division_type (str): The type of the division (1v1, 2v2, or 3v3).
+            channel (discord.TextChannel): The channel to which the challenges board will be posted.
+
+        Example:
+            /set_challenges_channel 2v2 #2v2-challenges
+
+        Output:
+            The 2v2 challenges channel has been set to #2v2-challenges
+        """
         result = await self.ladder_manager.set_challenges_channel(division_type, channel)
         await ctx.send(result)
     
@@ -273,20 +524,44 @@ class Ladderbot(commands.Cog):
         """
         Admin method to clear a division's challenges
         channel that has been set
+
+        This command is useful for when the challenges channel
+        for a division needs to be removed.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            division_type (str): The type of the division (1v1, 2v2, or 3v3).
+
+        Example:
+            /clear_challenges_channel 1v1
+
+        Output:
+            The challenges channel for the 1v1 division has been cleared.
         """
         result = self.ladder_manager.clear_challenges_channel(division_type)
         await ctx.send(result)
 
-    @commands.command()
+    @commands.command(name='show_help', help='Provides a link to the bot documentation.')
     async def show_help(self, ctx):
         """
-        Provides a link to the bot documentation
-        """
-        help_text = """
-    📖 **For more detailed information, refer to the bot's documentation.**
-    ** https://github.com/Theinfection91/Ladderbot3.0/blob/main/Ladderbot3Doc.md ** 📖
-        """
+        Provides a link to the bot documentation.
 
+        This command is useful for when a user wants to quickly
+        access the bot's documentation.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+
+        Example:
+            /show_help
+
+        Output: A link to the bot's documentation.
+        """
+        
+        help_text = """
+        📖 **For more detailed information, refer to the bot's documentation.**
+        ** https://github.com/Theinfection91/Ladderbot3.0/blob/main/Ladderbot3Doc.md ** 📖
+        """
         # Send the help text to the channel this method was called from
         await ctx.send(help_text)
 
