@@ -16,7 +16,7 @@
 ### Things to Come:
 
 - **Teams Channels**: Ways of displaying teams and all of their members into a specific channel for a given division, like how standings and challenges channels currently work.
-- **Logging System**: A way of saving log files to text of the tournament activities, commands, etc. and also a way to parse and have the bot read it back by giving it certain commands. This will make use of Python's builtin logging module.
+- **Logging System (INTRODUCED AND IN-PROGESS)**: A way of saving log files to text of the tournament activities, commands, etc. and also a way to parse and have the bot read it back by giving it certain commands. This will make use of Python's builtin logging module.
 - **Improved Error Handling**: More error messages when forgetting a parameter or using the wrong one. Currently some commands will not generate a response if used incorrectly, and even though nothing is happening in the backend it can worry the user that some data may have changed and they can't be sure because the bot didn't say anything.
 - **Open To New Ideas**: If you have any unique and creative ideas, or even a little one or tiny tweak you think would work well with this tournament manager, then please do not hesitate to let me know. I'm very open to new ideas as I really love doing this, but sometimes I work better when being asked to create something rather than trying to figure one out on my own.
 
