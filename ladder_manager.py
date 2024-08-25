@@ -32,7 +32,9 @@ class LadderManager:
         #Init the ladderbot.db when the LadderManager is instantiated
         initialize_database()
 
+        # Starts the update of both standings and challenges if they are set
         self.periodic_update_standings.start()
+        self.periodic_update_challenges.start()
 
     def create_test_teams(self, division_type):
         
