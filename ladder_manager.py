@@ -1,9 +1,9 @@
 import discord
 from discord.ext import tasks
 
-from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel, is_standings_channel_set, get_standings_channel_id, is_challenges_channel_set, get_challenges_channel_id, db_clear_standings_channel, db_clear_challenges_channel, get_team_members, db_clear_all_challenges, db_clear_all_teams
+from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel, is_standings_channel_set, get_standings_channel_id, is_challenges_channel_set, get_challenges_channel_id, db_clear_standings_channel, db_clear_challenges_channel, get_team_members, db_clear_all_challenges, db_clear_all_teams, get_teams_data
 
-from utils import is_correct_member_size, is_valid_division_type, has_duplicate_members, create_members_string, format_standings_data, format_challenges_data, add_time_stamp
+from utils import is_correct_member_size, is_valid_division_type, has_duplicate_members, create_members_string, format_standings_data, format_challenges_data, format_teams_data, add_time_stamp
 
 from config import VALID_DIVISION_TYPES
 
@@ -47,27 +47,27 @@ class LadderManager:
 
         if division_type == '1v1':
             
-            db_register_team('1v1', "Alpha", "Theinfection1991")
-            db_register_team('1v1', "Bravo", "Theinfection1991")
-            db_register_team('1v1', "Charlie", "Theinfection1991")
-            db_register_team('1v1', "Delta", "Theinfection1991")
-            db_register_team('1v1', "Echo", "Theinfection1991")
+            db_register_team('1v1', "Alpha420", "Theinfection1991")
+            db_register_team('1v1', "BravoSquad", "Theinfection1991")
+            db_register_team('1v1', "Charlie-40-9'er", "Theinfection1991")
+            db_register_team('1v1', "Delta.X", "Theinfection1991")
+            db_register_team('1v1', "EchoOne", "Theinfection1991")
             return f"Created five 1v1 test teams"
         
         if division_type == '2v2':
-            db_register_team('2v2', "Apple", "Theinfection1991")
-            db_register_team('2v2', "Butler", "Theinfection1991")
-            db_register_team('2v2', "Carlos", "Theinfection1991")
-            db_register_team('2v2', "Dynasty", "Theinfection1991")
-            db_register_team('2v2', "Ellen", "Theinfection1991")
+            db_register_team('2v2', "A.pp.le", "Theinfection1991, Ladderbot3.0")
+            db_register_team('2v2', "Butler", "Theinfection1991, Ladderbot3.0")
+            db_register_team('2v2', "Carlos466", "Theinfection1991, Ladderbot3.0")
+            db_register_team('2v2', "__Dynasty__", "Theinfection1991, Ladderbot3.0")
+            db_register_team('2v2', "Ell-en", "Theinfection1991, Ladderbot3.0")
             return f"Created five 2v2 test teams"
         
         if division_type == '3v3':
-            db_register_team('3v3', "A", "Theinfection1991")
-            db_register_team('3v3', "B", "Theinfection1991")
-            db_register_team('3v3', "C", "Theinfection1991")
-            db_register_team('3v3', "D", "Theinfection1991")
-            db_register_team('3v3', "E", "Theinfection1991")
+            db_register_team('3v3', "AngelWing", "Theinfection1991, Ladderbot3.0, TestNameLength")
+            db_register_team('3v3', "Bittersweet", "Theinfection1991, Ladderbot3.0, TestNameLength")
+            db_register_team('3v3', "Corn", "Theinfection1991, Ladderbot3.0, TestNameLength")
+            db_register_team('3v3', "DeerDiary", "Theinfection1991, Ladderbot3.0, TestNameLength")
+            db_register_team('3v3', "Extaseeeeeeeeee", "Theinfection1991, Ladderbot3.0, TestNameLength")
             return f"Created five 3v3 test teams"
   
     async def on_ready(self):
@@ -738,6 +738,28 @@ class LadderManager:
         logger.info(f'LadderManager: Created and formatted challenges data for return for given division_type for "post_challenges". division_type={division_type}')
 
         return formatted_challenges_data
+    
+    async def post_teams(self, division_type: str):
+        """
+        Method for posting division specific
+        teams directly into the channel this
+        is called from.
+        """
+        
+        # Check if correct division type was entered
+        if not is_valid_division_type(division_type):
+            logger.error(f'LadderManager: Wrong division type given for "post_teams". User entered: {division_type}')
+            return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. Example: /post_teams 3v3 ❌"
+        
+        # Get teams data from database for given division
+        raw_teams_data = get_teams_data(division_type)
+
+        # Format the raw teams data
+        formatted_teams_data = format_teams_data(division_type, raw_teams_data)
+
+        logger.info(f'LadderManager: Created and formatted teams data for return for given division_type for "post_teams". division_type={division_type}')
+
+        return formatted_teams_data
     
     async def set_standings_channel(self, division_type: str, channel: discord.TextChannel):
         """

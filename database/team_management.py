@@ -256,6 +256,23 @@ def get_standings_data(division_type: str):
     # Return teams to be used in helper function to format neatly
     return teams
 
+def get_teams_data(division_type: str):
+    """
+    Grabs data to populate teams channels
+    for the given division
+    """
+
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    # Fetch data for teams channel
+    cursor.execute("SELECT team_name, members FROM teams WHERE division = ? ORDER BY id", (division_type,))
+
+    teams_data = cursor.fetchall()
+    conn.close()
+
+    return teams_data
+    
 def db_set_rank(division_type: str, team_name: str, new_rank: int, current_rank: int):
     """
     Provides the logic for the set rank command

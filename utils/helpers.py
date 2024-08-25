@@ -58,6 +58,31 @@ def format_challenges_data(division_type: str, raw_challenges_data):
 
     return challenges_message
 
+def format_teams_data(division_type: str, raw_teams_data):
+    """
+    Formats raw teams data for a given division type
+    into something pretty for display in the teams channel.
+    """
+
+    # Prepare the teams message
+    header = f"👥 **{division_type.upper()} Division Teams** 👥\n"
+    header += "```\n"
+    header += "| Team Name         | Members                         \n"
+    header += "|-------------------|---------------------------------\n"
+
+    # Calculate the max width for the members column
+    members_col_width = 32  # Adjust this value as needed
+
+    teams_lines = [
+        f"| {team_name:<17} | {members:<{members_col_width}} "
+        "\n|-------------------|---------------------------------"
+        for team_name, members in raw_teams_data
+    ]
+
+    teams_message = header + "\n".join(teams_lines) + "\n```"
+
+    return teams_message
+
 async def add_time_stamp():
     """
     Returns a formatted time stamp of

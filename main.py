@@ -470,7 +470,27 @@ class Ladderbot(commands.Cog):
         Output: Formatted table of the current challenges in the given division
         """
         logger.info(f'Command "post_challenges" invoked by {ctx.author} with division_type={division_type}')
-        result = self.ladder_manager.post_challenges(division_type)
+        result = await self.ladder_manager.post_challenges(division_type)
+        await ctx.send(result)
+    
+    @commands.command()
+    async def post_teams(self, ctx, division_type: str):
+        """
+        This command is useful for when a user wants to quickly
+        see the current teams of a division without needing
+        to go to the #teams channel.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            division_type (str): The type of the division (1v1, 2v2, or 3v3).
+
+        Example:
+            /post_teams 3v3
+
+        Output: Formatted table of the current teams in the given division
+        """
+        logger.info(f'Command "post_teams" invoked by {ctx.author} with division_type={division_type}')
+        result = await self.ladder_manager.post_teams(division_type)
         await ctx.send(result)
     
     @commands.command()
