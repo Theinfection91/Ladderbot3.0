@@ -615,6 +615,30 @@ class Ladderbot(commands.Cog):
         logger.info(f'Command "set_teams_channel" invoked by {ctx.author} with division_type={division_type} channel={channel}')
         result = await self.ladder_manager.set_teams_channel(division_type, channel)
         await ctx.send(result)
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def clear_teams_channel(self, ctx, division_type: str):
+        """
+        Admin method to clear a division's teams
+        channel that has been set
+
+        This command is useful for when the challenges channel
+        for a division needs to be removed.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            division_type (str): The type of the division (1v1, 2v2, or 3v3).
+
+        Example:
+            /clear_teams_channel 1v1
+
+        Output:
+            The challenges channel for the 1v1 division has been cleared.
+        """
+        logger.info(f'Command "clear_teams_channel" invoked by {ctx.author} with division_type={division_type}')
+        result = self.ladder_manager.clear_teams_channel(division_type)
+        await ctx.send(result)
 
     @commands.command(name='show_help', help='Provides a link to the bot documentation.')
     async def show_help(self, ctx):

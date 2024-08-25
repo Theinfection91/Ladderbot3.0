@@ -890,6 +890,23 @@ class LadderManager:
 
         return f"👥 The {division_type} teams channel has been set to #{channel.mention}. 👥"
     
+    def clear_teams_channel(self, division_type: str):
+        """
+        Admin method to clear a division's teams
+        channel that has been set
+        """
+         # Check if correct division type was entered
+        if not is_valid_division_type(division_type):
+            return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again."
+        
+        # Check if channel is actually set
+        if not is_teams_channel_set(division_type):
+            return f"❌ The teams channel for the {division_type} division has not been set yet. You can set it for specific division types by using /set_teams_channel division_type #channel-name ❌"
+        else:
+            self.periodic_update_teams.stop()
+            db_clear_teams_channel(division_type)
+            return f"🛑 The teams channel for the {division_type} division has been cleared. 🛑"
+    
     async def update_standings_message(self, division_type: str, channel: discord.TextChannel):
         """
         Internal method used to edit the scoreboard
