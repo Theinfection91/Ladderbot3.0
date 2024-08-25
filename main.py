@@ -162,6 +162,9 @@ class Ladderbot(commands.Cog):
         A team may only challenge at most two ranks above their rank,
         and no team may challenge below their rank.
 
+        Once a successful challenge is created, the members of the challenged
+        team are sent a direct message from the bot with the details.
+
         Args:
             ctx (discord.ext.commands.Context): The context of the command.
             challenger_team (str): The name of the team that is challenging.
@@ -179,7 +182,8 @@ class Ladderbot(commands.Cog):
     @commands.command()
     async def cancel_challenge(self, ctx, challenger_team: str):
         """
-        Will cancel the challenge of a given challenger team
+        Will cancel the challenge of a given challenger team,
+        must be used by someone who is apart of the challenger team.
 
         Args:
             ctx (discord.ext.commands.Context): The context of the command.
