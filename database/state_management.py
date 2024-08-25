@@ -109,6 +109,42 @@ def get_challenges_channel_id(division_type: str):
     if result is not None:
         return result
 
+def is_teams_channel_set(division_type: str):
+    """
+    Checks if there is data within the given
+    division's teams channel id that
+    will return true or false
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT teams_channel_id FROM states WHERE division = ?", (division_type,))
+    result = cursor.fetchone()[0]
+
+    conn = conn.close()
+
+    if result is None:
+        return False
+    
+    else:
+        return True
+
+def get_teams_channel_id(division_type: str):
+    """
+    Returns the integer id for the channel
+    that is set for the given division type
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT teams_channel_id FROM states WHERE division = ?", (division_type,))
+    result = cursor.fetchone()[0]
+
+    conn = conn.close()
+
+    if result is not None:
+        return result
+
 def db_set_standings_channel(division_type: str, channel_id: int):
     """
     Sets the channel ID of the 
@@ -161,6 +197,34 @@ def db_clear_challenges_channel(division_type: str):
     cursor = conn.cursor()
 
     cursor.execute("UPDATE states SET challenges_channel_id = ? WHERE division = ?", (None, division_type))
+
+    conn.commit()
+    conn.close()
+
+def db_set_teams_channel(division_type: str, channel_id: int):
+    """
+    Sets the channel ID of the
+    teams board to the given integer
+    value and given division type
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    # Update table with channel id integer
+    cursor.execute("UPDATE states SET teams_channel_id = ? WHERE division = ?", (channel_id, division_type))
+
+    conn.commit()
+    conn.close()
+
+def db_clear_teams_channel(division_type: str):
+    """
+    Sets the teams channel id to None
+    in the given division type
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE states SET teams_channel_id = ? WHERE division = ?", (None, division_type))
 
     conn.commit()
     conn.close()

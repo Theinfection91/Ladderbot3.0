@@ -589,6 +589,32 @@ class Ladderbot(commands.Cog):
         logger.info(f'Command "clear_challenges_channel" invoked by {ctx.author} with division_type={division_type}')
         result = self.ladder_manager.clear_challenges_channel(division_type)
         await ctx.send(result)
+    
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def set_teams_channel(self, ctx, division_type: str, channel: discord.TextChannel):
+        """
+        Admin method to set the updating
+        teams channel to specified channel
+        for the given division type.
+
+        This command is useful for when an admin want to set
+        the channel that the challenges will be posted to.
+
+        Args:
+            ctx (discord.ext.commands.Context): The context of the command.
+            division_type (str): The type of the division (1v1, 2v2, or 3v3).
+            channel (discord.TextChannel): The channel to which the teams board will be posted.
+
+        Example:
+            /set_teams_channel 3v3 #3v3-teams
+
+        Output:
+            The 3v3 teams channel has been set to #3v3-teams
+        """
+        logger.info(f'Command "set_teams_channel" invoked by {ctx.author} with division_type={division_type} channel={channel}')
+        result = await self.ladder_manager.set_teams_channel(division_type, channel)
+        await ctx.send(result)
 
     @commands.command(name='show_help', help='Provides a link to the bot documentation.')
     async def show_help(self, ctx):
