@@ -1,11 +1,9 @@
-# Import the different divisions here
-
 import discord
 from discord.ext import tasks
 
 from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel, is_standings_channel_set, get_standings_channel_id, is_challenges_channel_set, get_challenges_channel_id, db_clear_standings_channel, db_clear_challenges_channel, get_team_members, db_clear_all_challenges, db_clear_all_teams
 
-from utils import is_correct_member_size, create_members_string, format_standings_data, format_challenges_data, add_time_stamp
+from utils import is_correct_member_size, is_valid_division_type, create_members_string, format_standings_data, format_challenges_data, add_time_stamp
 
 from config import VALID_DIVISION_TYPES
 
@@ -37,6 +35,9 @@ class LadderManager:
         self.periodic_update_standings.start()
 
     def create_test_teams(self, division_type):
+        
+        if not is_valid_division_type(division_type):
+            return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. ❌"
         
         if division_type == '1v1':
             db_register_team('1v1', "Alpha", "Theinfection1991")
@@ -94,8 +95,8 @@ class LadderManager:
         """
         
         """
-        if division_type not in VALID_DIVISION_TYPES:
-            return f"❌ Invalid division type was given. Please try again using 1v1, 2v2, or 3v3. ❌"
+        if not is_valid_division_type(division_type):
+            return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. ❌"
         
         if is_ladder_running(division_type):
             return f"❌ The {division_type} division of the ladder is already running... ❌"
@@ -108,8 +109,8 @@ class LadderManager:
         
         """
         # Check if correct division type was entered
-        if division_type not in VALID_DIVISION_TYPES:
-            return f"❌ Invalid division type was given. Please try again using 1v1, 2v2, or 3v3. ❌"
+        if not is_valid_division_type(division_type):
+            return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. ❌"
 
         if not is_ladder_running(division_type):
             return f"❌ The {division_type} division of the ladder is not currently running... ❌"
@@ -134,7 +135,7 @@ class LadderManager:
         if is_team_name_unique(team_name):
 
             # Check if correct divison type was entered
-            if division_type in VALID_DIVISION_TYPES:
+            if not is_valid_division_type(division_type):
 
                 # Check if correct amount of members was given for the division type
                 if is_correct_member_size(division_type, *members):
@@ -580,8 +581,9 @@ class LadderManager:
         standings of a given division type into
         the channel this was called from
         """
-        if division_type not in VALID_DIVISION_TYPES:
-            return f"❌ Invalid division type entered. Example: /post_standings 2v2 ❌"
+        # Check if correct division type was entered
+        if not is_valid_division_type(division_type):
+            return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. Example: /post_standings 2v2 ❌"
         
         # Get standings data from database for given division type
         raw_standings_data = get_standings_data(division_type)
@@ -597,8 +599,9 @@ class LadderManager:
         challenges of a given division type into
         the channel this was called from
         """
-        if division_type not in VALID_DIVISION_TYPES:
-            return f"❌ Invalid division type entered. Example: /post_challenges 1v1 ❌"
+        # Check if correct division type was entered
+        if not is_valid_division_type(division_type):
+            return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. Example: /post_challenges 1v1 ❌"
         
         # Get challenges data from database for given division type
         raw_challenges_data = get_challenges_data(division_type)
@@ -614,10 +617,9 @@ class LadderManager:
         for the updating standings board for given
         division type
         """
-        
-        # Check if correct division type was entered
-        if division_type not in VALID_DIVISION_TYPES:
-            return f"❌ Invalid division type was given. Please try again using 1v1, 2v2, or 3v3 after /set_standings_channel\n\tExample: /set_standings_channel 2v2 #2v2-standings ❌"
+         # Check if correct division type was entered
+        if not is_valid_division_type(division_type):
+            return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again using 1v1, 2v2, or 3v3 after /set_standings_channel\n\tExample: /set_standings_channel 2v2 #2v2-standings ❌"
             
         db_clear_standings_channel(division_type)
             
@@ -643,6 +645,11 @@ class LadderManager:
         Admin method to clear a division's standings
         channel that has been set
         """
+         # Check if correct division type was entered
+        if not is_valid_division_type(division_type):
+            return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again."
+        
+        # Check if channel is actually set
         if not is_standings_channel_set(division_type):
             return f"❌ The standings channel for the {division_type} division has not been set yet. You can set it for specific division types by using /set_standings_channel division_type #channel-name ❌"
         else:
@@ -656,9 +663,9 @@ class LadderManager:
         for the updating challenges board for given
         division type 
         """
-        # Check if correct division type was entered
-        if division_type not in VALID_DIVISION_TYPES:
-            return f"❌ Invalid division type was given. Please try again using 1v1, 2v2, or 3v3 after /set_challenges_channel\n\tExample: /set_challenges_channel 3v3 #3v3-challenges ❌"
+         # Check if correct division type was entered
+        if not is_valid_division_type(division_type):
+            return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again using 1v1, 2v2, or 3v3 after /set_challenges_channel\n\tExample: /set_challenges_channel 3v3 #3v3-challenges ❌"
         
         db_clear_challenges_channel(division_type)
         
@@ -683,6 +690,11 @@ class LadderManager:
         Admin method to clear a division's challenges
         channel that has been set
         """
+         # Check if correct division type was entered
+        if not is_valid_division_type(division_type):
+            return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again."
+        
+        # Check if channel is actually set
         if not is_challenges_channel_set(division_type):
             return f"❌ The challenges channel for the {division_type} division has not been set yet. You can set it for specific division types by using /set_challenges_channel division_type #channel-name ❌"
         else:

@@ -1,6 +1,6 @@
+from config import VALID_DIVISION_TYPES
 
-
-def is_correct_member_size(division_type, *members):
+def is_correct_member_size(division_type: str, *members):
     """
     Validates if the given number of members
     is the correct amount for the given
@@ -18,3 +18,13 @@ def is_correct_member_size(division_type, *members):
     
     else:
         return False
+
+def is_valid_division_type(division_type: str) -> bool:
+    """
+    Checks if user entered valid division type
+    as a parameter
+    """
+    if division_type not in VALID_DIVISION_TYPES:
+        return False
+    else:
+        return True
