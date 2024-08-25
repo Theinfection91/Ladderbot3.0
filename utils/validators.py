@@ -28,3 +28,12 @@ def is_valid_division_type(division_type: str) -> bool:
         return False
     else:
         return True
+    
+def has_duplicate_members(members):
+    """
+    Checks if list has multiple members in it
+    """
+    if len(members) != len(set(members)):
+        return True
+    else:
+        return False

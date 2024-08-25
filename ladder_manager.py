@@ -3,7 +3,7 @@ from discord.ext import tasks
 
 from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel, is_standings_channel_set, get_standings_channel_id, is_challenges_channel_set, get_challenges_channel_id, db_clear_standings_channel, db_clear_challenges_channel, get_team_members, db_clear_all_challenges, db_clear_all_teams
 
-from utils import is_correct_member_size, is_valid_division_type, create_members_string, format_standings_data, format_challenges_data, add_time_stamp
+from utils import is_correct_member_size, is_valid_division_type, has_duplicate_members, create_members_string, format_standings_data, format_challenges_data, add_time_stamp
 
 from config import VALID_DIVISION_TYPES
 
@@ -189,6 +189,11 @@ class LadderManager:
                         if is_member_registered(division_type, member_display_name):
                             logger.error(f'LadderManager: Member already found on team in given division type. User entered: division_type={division_type} conflicting_member={member_display_name}')     
                             return f"{member_display_name} is already registered on a team in the {division_type} division. Please try again."
+                        
+                    # Pass *members: discord.Member object as members                  
+                    if has_duplicate_members(members):
+                        logger.error(f'LadderManager: The same member is trying to be registered to the same team twice: division_type={division_type} members={member_display_names}')
+                        return f"❌ You are trying to register the same member twice. Please try again. Members entered: {member_display_names} ❌"
                     
                     # NOTE :----------------------------------------
                         
