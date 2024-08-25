@@ -7,17 +7,18 @@
 ### Key Features:
 
 - **Ladder Management**: Start and end ladders for specific divisions (1v1, 2v2, 3v3) with administrative commands.
-- **Team Management**: Register and remove teams from the ladder
+- **Team Management**: Admins can register and remove teams from each specific division of ladder
 - **Challenge System**: Allow teams to challenge each other and manage these challenges. Admins have additional capabilities to manually create or cancel challenges.
 - **Match Reporting**: Report match results to update standings and ranks, with both user-level and admin-level commands for reporting wins and adjusting ranks.
 - **Standings and Challenges**: Post current standings and challenges in specific channels, with options to set channels for automatic updates.
-- **Administrative Controls**: Admins have extended functionalities to manually adjust team ranks, wins, and losses.
+- **Administrative Controls**: Admins have extended functionalities to manually adjust team ranks, wins, and losses as well as more to come in future updates.
 - **Teams Channels (INTRODUCED AND IN-PROGESS)**: You can now use ```/post_teams <division_type>``` to have the bot spit out a table similar to challenges and standings of the teams in that division and their member(s). Soon there will be a way of displaying teams and all of their members into a specific channel for a given division, like how standings and challenges channels currently work.
 - **Logging System (INTRODUCED AND IN-PROGESS)**: Have access to a ladderbot.log file in the logs folder that will keep track of command invokes by every user, show what parameters were being passed through methods, and allow a way to visually see and keep track of errors. This is still being implemented through out the program, and may eventually lead to having commands in the bot to show and filter certain aspects of the log files within a certain given parameters. The log files are set to begin removing data at 5MB and will hold a maximum of 5 back up copies of the log.
 
 ### Things to Come:
 
 - **Improved Error Handling**: More error messages when forgetting a parameter or using the wrong one. Currently some commands will not generate a response if used incorrectly, and even though nothing is happening in the backend it can worry the user that some data may have changed and they can't be sure because the bot didn't say anything.
+- **Stat Tracking and Achievements**: An idea I've been thinking over of having team, and also individual member stat tracking and achievements at both levels. This is a very advanced idea for me and will take some research and time if I ever implement it completely to my liking. But the general basic idea would be to keep track of maybe how many times a team faced each other in a division ladder from start to end, how "far" a team traveled in the rankings by counting every rank change interval (up and down) that happened to them from results of their challenges or them being challenged. Then you could also have player stats and achievements that could work off of using their Discord ID to store all of these stats and events into the SQLite database. Player achievements could include being apart of the champion team of a ladder when it ends, or keep track of a stat like how "far" they have moved in total throughout specific divisions of ladders as well. Again, pretty advanced stuff so this will all take some time to fully implement as I work on and fix other stuff with the current code.
 - **Open To New Ideas**: If you have any unique and creative ideas, or even a little one or tiny tweak you think would work well with this tournament manager, then please do not hesitate to let me know. I'm very open to new ideas as I really love doing this, but sometimes I work better when being asked to create something rather than trying to figure one out on my own.
 
 # Discord Bot Token Usage
