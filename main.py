@@ -108,7 +108,7 @@ class Ladderbot(commands.Cog):
         
         NOTE: Team names are unique across the entire program,
         meaning if there is a Team Alpha in the 2v2 division then
-        the program will now allow a Team Alpha to be created in the
+        the program will not allow a Team Alpha to be created in the
         1v1 or 3v3 division. By having team names unique this way it 
         reduces the need for inputting division type on some commands
         like remove_team, challenges, and report_wins.
