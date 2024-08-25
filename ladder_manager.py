@@ -77,26 +77,42 @@ class LadderManager:
         """
         # Show the bot has logged in to server showing it's username
         print(f"Logged in as {self.bot.user}")
+        logger.info(f'LadderManager: "on_ready" initiated. Logged in as {self.bot.user}')
 
         # Check if any ladders are currently running, if so print which ones
         for division_type in VALID_DIVISION_TYPES:
+        # Ladder Running Check
             if is_ladder_running(division_type):
+                logger.info(f'LadderManager: "on_ready" found ladder running in {division_type} division.')
                 print(f"The {division_type} division of the ladder is currently running.")
-        
-        if is_challenges_channel_set(division_type):
-            challenge_channel_id = get_challenges_channel_id(division_type)
-            challenge_channel = self.bot.get_channel(challenge_channel_id)
-            if isinstance(challenge_channel, discord.TextChannel):
-                await self.update_challenges_message(division_type, challenge_channel)
-                self.periodic_update_challenges.start()
-        
-        for division_type in VALID_DIVISION_TYPES:
+
+            # Challenge Channel Logic
+            if is_challenges_channel_set(division_type):
+                challenge_channel_id = get_challenges_channel_id(division_type)
+                challenge_channel = self.bot.get_channel(challenge_channel_id)
+                logger.info(f'LadderManager: "on_ready" found challenges channel ID {challenge_channel} set for {division_type} division.')
+
+                if isinstance(challenge_channel, discord.TextChannel):
+                    await self.update_challenges_message(division_type, challenge_channel)
+                    logger.info(f'LadderManager: "on_ready" updating the challenges channel message in {challenge_channel} for {division_type} division.')
+                    self.periodic_update_challenges.restart()
+                    logger.info(f'LadderManager: "on_ready" starting the periodic update to the challenges channel in {challenge_channel} for {division_type} division.')
+            else:
+                logger.warning(f'LadderManager: "on_ready" no challenges channel set for {division_type} division.')
+
+            # Standings Channel Logic
             if is_standings_channel_set(division_type):
                 standings_channel_id = get_standings_channel_id(division_type)
                 standings_channel = self.bot.get_channel(standings_channel_id)
+                logger.info(f'LadderManager: "on_ready" found standings channel ID {standings_channel} set for {division_type} division.')
+
                 if isinstance(standings_channel, discord.TextChannel):
                     await self.update_standings_message(division_type, standings_channel)
-                    self.periodic_update_standings.start()
+                    logger.info(f'LadderManager: "on_ready" updating the standings channel message in {standings_channel} for {division_type} division.')
+                    self.periodic_update_standings.restart()
+                    logger.info(f'LadderManager: "on_ready" starting the periodic update to the standings channel in {standings_channel} for {division_type} division.')
+            else:
+                logger.warning(f'LadderManager: "on_ready" no standings channel set for {division_type} division.')
     
     def start_ladder(self, division_type: str) -> str:
         """
@@ -107,9 +123,11 @@ class LadderManager:
             return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. ❌"
         
         if is_ladder_running(division_type):
+            logger.error(f'LadderManager: The division given for "start_ladder" is already running. User entered: {division_type}')
             return f"❌ The {division_type} division of the ladder is already running... ❌"
         
         set_ladder_running(division_type, True)
+        logger.info(f'LadderManager: The {division_type} division of the ladder has started using "start_ladder" {division_type}')
         return f"🔥 The {division_type} division of the ladder has started! 🔥"
     
     async def end_ladder(self, division_type):
@@ -122,19 +140,24 @@ class LadderManager:
             return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. ❌"
 
         if not is_ladder_running(division_type):
+            logger.error(f'LadderManager: The ladder for given division for "end_ladder" is not running. User entered: {division_type}')
             return f"❌ The {division_type} division of the ladder is not currently running... ❌"
         
         final_standings = await self.post_standings(division_type)
         
         # Set ladder running to False for given division
         set_ladder_running(division_type, False)
+        logger.info(f'LadderManager: The {division_type} division of the ladder has ended using "end_ladder" {division_type}')
 
         # Clear challenges and teams for given division
         db_clear_all_challenges(division_type)
+        logger.info(f'LadderManager: All challenges in {division_type} division of the ladder has been erased.')
         db_clear_all_teams(division_type)
+        logger.info(f'LadderManager: All teams in {division_type} division of the ladder has been removed.')
 
         end_ladder_message = f"\t\t💥 The {division_type} division of the ladder has ended! 💥\n\n"
         end_ladder_message += final_standings
+        logger.info(f'LadderManager: Generated string informing users the {division_type} ladder has ended and prints the final standings for the {division_type} division.')
         return end_ladder_message
 
     def register_team(self, division_type: str, team_name: str, *members: discord.Member):
