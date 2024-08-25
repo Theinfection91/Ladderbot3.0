@@ -139,6 +139,15 @@ For more detailed usage and examples of each command, please refer to the specif
 - **Response:** Lists current rankings of given division.
 - **Permissions:** Any user can view standings.
 
+### Posting Teams
+- **Command:** `/post_teams <division_type>`
+- **Description:** Displays the current teams and it's members for the given division type
+- **Parameters:**
+  - `<division_type>`: The specific division of standings to post.
+- **Example:** `/post_teams 3v3`
+- **Response:** Lists current teams and it's members of given division.
+- **Permissions:** Any user can view teams.
+
 ### Setting the Standings Channel
 - **Command:** `/set_standings_channel <division_type> <#channel>`
 - **Description:** Sets the channel where standings will be posted for given division type.
