@@ -487,6 +487,7 @@ class LadderManager:
         """
         # Checks if given team exists
         if not does_team_exist(winning_team):
+            logger.error(f'LadderManager: No winning_team name found for "report_win". User entered: winning_team={winning_team}')
             return f"❌ No team found by the name of {winning_team}. Please try again."
         
         # If team exists, grab its division type
@@ -494,11 +495,13 @@ class LadderManager:
 
         # Check if the ladder is running in the given division type
         if not is_ladder_running(division_type):
+            logger.error(f'LadderManager: The ladder is not currently running on the given division_type. Parameter used: {division_type}')
             return f"❌ The {division_type} division of the ladder has not started yet... ❌"
         
         # Check if author of command call is on the winning team
         display_name = ctx.author.display_name
         if not is_member_on_team(display_name, winning_team):
+            logger.error(f'LadderManager: User not part of winning team tried to report_win. User: {display_name}')
             return f"❌ You are not a member of Team {winning_team}. ❌"
         
         # Check if the given team is the challenger
@@ -507,15 +510,26 @@ class LadderManager:
             losing_team = find_opponent_team(division_type, winning_team)
             
             # Update ranks when challenger wins
+            logger.info(f"LadderManager: Challenger team has reported win over opponent challenged team. winning_challenger={winning_team} losing_challenged={losing_team}")
+            
             db_update_rankings(division_type, winning_team, losing_team)
+            logger.info(f"LadderManager: Winning challenger team: {winning_team} takes the losing challenged team: {losing_team} rank and challenged losing team moves down one rank. Win and loss is added to appropriate teams.")
+            
             remove_challenge(division_type, winning_team)
+            logger.info(f"LadderManager: Challenge from {division_type} division involving Team {winning_team} and Team {losing_team} removed from database.")
+            
             return f"🏆 Team {winning_team} has won the match and taken the rank of Team {losing_team}! Team {losing_team} moves down one in the ranks. 🏆"
         else:
             # If the winning team was the challenged team, no rank change occurs
             losing_team = find_opponent_team(division_type, winning_team)
+            
             add_team_wins_losses(division_type, winning_team, win=True)
             add_team_wins_losses(division_type, losing_team, win=False)
+            logger.info(f"LadderManager: Team {winning_team} has won against Team {losing_team} in the {division_type} division, no rank change occurs since {winning_team} was the challenged team.")
+            
             remove_challenge(division_type, losing_team)
+            logger.info(f"LadderManager: Challenge from {division_type} division involving Team {winning_team} and Team {losing_team} removed from database.")
+            
             return f"🏆 Team {winning_team} has won the match against Team {losing_team}, but no rank changes occur since Team {winning_team} was the challenged team. 🏆"
     
     def admin_report_win(self, winning_team: str):
@@ -526,6 +540,7 @@ class LadderManager:
         """
         # Checks if given team exists
         if not does_team_exist(winning_team):
+            logger.error(f'LadderManager: No winning_team found by name given for "admin_report_win". User entered: winning_team={winning_team}')
             return f"❌ No team found by the name of {winning_team}. Please try again. ❌"
         
         # If team exists, grab its division type
@@ -533,23 +548,37 @@ class LadderManager:
 
         # Check if the ladder is running in the given division type
         if not is_ladder_running(division_type):
+            logger.error(f'LadderManager: The ladder is not currently running on the given division_type. Parameter used: {division_type}')
             return f"❌ The {division_type} division of the ladder has not started yet... ❌"
         
         # Check if the given team is the challenger
         if has_team_challenged(division_type, winning_team):
             # Find the opponent team to determine the loser
             losing_team = find_opponent_team(division_type, winning_team)
-            
+            logger.info(f"LadderManager: 'admin_report_win' Admn has reported challenger team {winning_team} winning over opponent challenged team {losing_team} in the {division_type} division. winning_challenger={winning_team} losing_challenged={losing_team}")
+
             # Update ranks when challenger wins
             db_update_rankings(division_type, winning_team, losing_team)
+            logger.info(f"LadderManager: 'admin_report_win' Winning challenger team: {winning_team} takes the losing challenged team: {losing_team} rank and challenged losing team moves down one rank. Win and loss is added to appropriate teams.")
+            
+            # Remove the challenge
             remove_challenge(division_type, winning_team)
+            logger.info(f"LadderManager: 'admin_report_win' Challenge from {division_type} division involving Team {winning_team} and Team {losing_team} removed from database.")
+            
             return f"🏆 Team {winning_team} has won the match and taken the rank of Team {losing_team}! Team {losing_team} moves down one in the ranks. This report was made by an Administrator. 🏆"
         else:
             # If the winning team was the challenged team, no rank change occurs
             losing_team = find_opponent_team(division_type, winning_team)
+            
+            # Add win/loss to correct team, no rank change when challenged team wins
             add_team_wins_losses(division_type, winning_team, win=True)
             add_team_wins_losses(division_type, losing_team, win=False)
+            logger.info(f"LadderManager: 'admin_report_win' Team {winning_team} has won against Team {losing_team} in the {division_type} division, no rank change occurs since {winning_team} was the challenged team.")
+
+            # Remove the challenge
             remove_challenge(division_type, losing_team)
+            logger.info(f"LadderManager: 'admin_report_win' Challenge from {division_type} division involving Team {winning_team} and Team {losing_team} removed from database.")
+            
             return f"🏆 Team {winning_team} has won the match against Team {losing_team}, but no rank changes occur since Team {winning_team} was the challenged team. This report was made by an Administrator. 🏆"
 
     def set_rank(self, team_name: str, new_rank: int):
@@ -558,6 +587,7 @@ class LadderManager:
         of a team
         """
         if not does_team_exist(team_name):
+            logger.error(f'LadderManager: No team found by given team name for "set_rank". User entered: team_name={team_name}')
             return f"❌ No team found by the name of {team_name}. Please try again. ❌"
 
         # If team exists, find division type
@@ -571,15 +601,18 @@ class LadderManager:
         
         # Check if new rank is valid
         if new_rank < 1 or new_rank > max_rank:
+            logger.error(f'LadderManager: Invalid rank given for "set_rank". max_rank={max_rank} min_rank=1 User entered: {new_rank}')
             return f"❌ Invalid rank. The rank should be between 1 and {max_rank}. Please try again. ❌"
         
         # Check if new rank being entered is the current rank of given team
         elif new_rank == current_rank:
+            logger.error(f'LadderManager: Given team is already at the given new rank for for "set_rank". team_name={team_name} current_rank={current_rank} new_rank_given={new_rank}')
             return f"❌ {team_name} is already at rank {new_rank} in the {division_type} division. Please try again. ❌"
         
         else:
             # Update the ranks if all conditions pass
             db_set_rank(division_type, team_name, new_rank, current_rank)
+            logger.info(f'LadderManager: Given team was assigned to the new rank in their division with "set_rank" and all other teams were adjusted accordingly. team_name={team_name} new_rank={new_rank} division_type={division_type}')
             return f"📈 Team {team_name} has been assigned to the rank of {new_rank} in the {division_type} division. 📈"
     
     def add_win(self, team_name: str):
@@ -588,6 +621,7 @@ class LadderManager:
         win to a given team
         """
         if not does_team_exist(team_name):
+            logger.error(f'LadderManager: No team found by given team name for "add_win". User entered: team_name={team_name}')
             return f"❌ No team found by the name of {team_name}. Please try again. ❌"
         
         # Grab division type if team is found
@@ -595,6 +629,7 @@ class LadderManager:
 
         # Add win to team
         add_team_wins_losses(division_type, team_name, True)
+        logger.info(f'LadderManager: Successfully added 1 win to the given team with "add_win". team_name={team_name} division_type={division_type}')
         return f"📈 Team {team_name} has been given a win by an Administrator. 📈"
 
     def subtract_win(self, team_name: str):
@@ -603,6 +638,7 @@ class LadderManager:
         win to a given team
         """
         if not does_team_exist(team_name):
+            logger.error(f'LadderManager: No team found by given team name for "subtract_win". User entered: team_name={team_name}')
             return f"❌ No team found by the name of {team_name}. Please try again. ❌"
         
         # Grab division type if team is found
@@ -612,10 +648,12 @@ class LadderManager:
         current_wins = get_wins_or_losses(team_name, True)
 
         if current_wins < 1:
+            logger.error(f'LadderManager: Team found by given team name has no wins for "subtract_win" to minus from. User entered: team_name={team_name} team_name_wins={current_wins}')
             return f"❌ Team {team_name} does not have any wins to take away. ❌" 
         
         if current_wins >= 1:
             subtract_team_wins_losses(division_type, team_name, True)
+            logger.info(f'LadderManager: Successfully subtracted 1 win from the given team with "subtract_win". This leaves Team {team_name} with {current_wins - 1}. team_name={team_name} division_type={division_type}')
             return f"📈 Team {team_name} has had a win taken away by an Administrator. They now have {current_wins - 1} wins. 📈"
     
     def add_loss(self, team_name: str):
@@ -624,6 +662,7 @@ class LadderManager:
         loss to a given team
         """
         if not does_team_exist(team_name):
+            logger.error(f'LadderManager: No team found by given team name for "add_loss". User entered: team_name={team_name}')
             return f"❌ No team found by the name of {team_name}. Please try again. ❌"
         
         # Grab division type if team is found
@@ -631,6 +670,7 @@ class LadderManager:
 
         # Add loss to the team
         add_team_wins_losses(division_type, team_name, False)
+        logger.info(f'LadderManager: Successfully added 1 loss to the given team with "add_loss". team_name={team_name} division_type={division_type}')
         return f"📈 Team {team_name} has been given a loss by an Administrator. 📈"
     
     def subtract_loss(self, team_name: str):
@@ -639,6 +679,7 @@ class LadderManager:
         loss to a given team
         """
         if not does_team_exist(team_name):
+            logger.error(f'LadderManager: No team found by given team name for "subtract_loss". User entered: team_name={team_name}')
             return f"❌ No team found by the name of {team_name}. Please try again. ❌"
 
         # Grab division type if team is found
@@ -648,10 +689,12 @@ class LadderManager:
         current_losses = get_wins_or_losses(team_name, False)
 
         if current_losses < 1:
+            logger.error(f'LadderManager: Team found by given team name has no losses for "subtract_loss" to minus from. User entered: team_name={team_name} team_name_wins={current_losses}')
             return f"❌ Team {team_name} does not have any losses to take away. ❌"
         
         if current_losses >= 1:
             subtract_team_wins_losses(division_type, team_name, False)
+            logger.info(f'LadderManager: Successfully subtracted 1 loss from the given team with "subtract_loss". This leaves Team {team_name} with {current_losses - 1}. team_name={team_name} division_type={division_type}')
             return f"📈 Team {team_name} has had a loss taken away by an Administrator. They now have {current_losses - 1} losses. 📈"
         
     async def post_standings(self, division_type: str):
@@ -662,6 +705,7 @@ class LadderManager:
         """
         # Check if correct division type was entered
         if not is_valid_division_type(division_type):
+            logger.error(f'LadderManager: Wrong division type given for "post_standings". User entered: {division_type}')
             return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. Example: /post_standings 2v2 ❌"
         
         # Get standings data from database for given division type
@@ -669,6 +713,8 @@ class LadderManager:
 
         # Format the raw standings data into something pretty
         formatted_standings_data = format_standings_data(division_type, raw_standings_data)
+
+        logger.info(f'LadderManager: Created and formatted standings data for return for given division_type for "post_standings". division_type={division_type}')
 
         return formatted_standings_data
 
@@ -680,6 +726,7 @@ class LadderManager:
         """
         # Check if correct division type was entered
         if not is_valid_division_type(division_type):
+            logger.error(f'LadderManager: Wrong division type given for "post_challenges". User entered: {division_type}')
             return "❌ Please enter 1v1 2v2 or 3v3 for the division type and try again. Example: /post_challenges 1v1 ❌"
         
         # Get challenges data from database for given division type
@@ -687,6 +734,8 @@ class LadderManager:
 
         # Format the raw standings data
         formatted_challenges_data = format_challenges_data(division_type ,raw_challenges_data)
+
+        logger.info(f'LadderManager: Created and formatted challenges data for return for given division_type for "post_challenges". division_type={division_type}')
 
         return formatted_challenges_data
     
