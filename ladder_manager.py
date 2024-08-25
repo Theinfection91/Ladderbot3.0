@@ -141,7 +141,7 @@ class LadderManager:
         if is_team_name_unique(team_name):
 
             # Check if correct divison type was entered
-            if not is_valid_division_type(division_type):
+            if is_valid_division_type(division_type):
 
                 # Check if correct amount of members was given for the division type
                 if is_correct_member_size(division_type, *members):

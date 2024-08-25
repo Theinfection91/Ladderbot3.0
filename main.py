@@ -125,6 +125,7 @@ class Ladderbot(commands.Cog):
         Output:
             Team Alpha has been registered in the 2v2 division with the following members: Ixnay, Flaw
         """
+        
         result = self.ladder_manager.register_team(division_type, team_name, *members)
         await ctx.send(result)
     
