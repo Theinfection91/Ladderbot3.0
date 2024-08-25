@@ -309,7 +309,7 @@ class LadderManager:
         """
         # Check if given team exists in the database
         if not does_team_exist(challenger_team):
-            return f"No Team found by the name of {challenger_team}. Please try again."
+            return f"❌ No Team found by the name of {challenger_team}. Please try again. ❌"
         
         # Capture the author of the command call's display name and team division
         display_name = ctx.author.display_name
@@ -644,11 +644,11 @@ class LadderManager:
         channel that has been set
         """
         if not is_standings_channel_set(division_type):
-            return f"The standings channel for the {division_type} division has not been set yet. You can set it for specific division types by using /set_standings_channel division_type #channel-name"
+            return f"❌ The standings channel for the {division_type} division has not been set yet. You can set it for specific division types by using /set_standings_channel division_type #channel-name ❌"
         else:
             self.periodic_update_standings.stop()
             db_clear_standings_channel(division_type)
-            return f"The standings channel for the {division_type} division has been cleared."
+            return f"🛑 The standings channel for the {division_type} division has been cleared. 🛑"
     
     async def set_challenges_channel(self, division_type: str, channel: discord.TextChannel):
         """
@@ -688,7 +688,7 @@ class LadderManager:
         else:
             self.periodic_update_challenges.stop()
             db_clear_challenges_channel(division_type)
-            return f"The challenges channel for the {division_type} division has been cleared."
+            return f"🛑 The challenges channel for the {division_type} division has been cleared. 🛑"
     
     async def update_standings_message(self, division_type: str, channel: discord.TextChannel):
         """

@@ -283,8 +283,8 @@ class Ladderbot(commands.Cog):
         Provides a link to the bot documentation
         """
         help_text = """
-    **For more detailed information, refer to the bot's documentation.**
-    ** https://github.com/Theinfection91/Ladderbot3.0/blob/main/Ladderbot3Doc.md **
+    📖 **For more detailed information, refer to the bot's documentation.**
+    ** https://github.com/Theinfection91/Ladderbot3.0/blob/main/Ladderbot3Doc.md ** 📖
         """
 
         # Send the help text to the channel this method was called from
