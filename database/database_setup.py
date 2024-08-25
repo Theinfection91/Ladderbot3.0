@@ -75,24 +75,25 @@ def create_tables(conn):
     division TEXT NOT NULL,
     ladder_running BOOLEAN NOT NULL DEFAULT FALSE,
     standings_channel_id INTEGER DEFAULT NULL,
-    challenges_channel_id INTEGER DEFAULT NULL           
+    challenges_channel_id INTEGER DEFAULT NULL,
+    teams_channel_id INTEGER DEFAULT NULL           
 )
 ''')
     
     # Insert default division states and channel id's if not already present
     cursor.execute('''
-    INSERT INTO states (division, ladder_running, standings_channel_id, challenges_channel_id)
-    SELECT * FROM (SELECT '1v1', FALSE, NULL, NULL) AS tmp
+    INSERT INTO states (division, ladder_running, standings_channel_id, challenges_channel_id, teams_channel_id)
+    SELECT * FROM (SELECT '1v1', FALSE, NULL, NULL, NULL) AS tmp
     WHERE NOT EXISTS (
         SELECT division FROM states WHERE division = '1v1'
     )
     UNION ALL
-    SELECT * FROM (SELECT '2v2', FALSE, NULL, NULL) AS tmp
+    SELECT * FROM (SELECT '2v2', FALSE, NULL, NULL, NULL) AS tmp
     WHERE NOT EXISTS (
         SELECT division FROM states WHERE division = '2v2'
     )
     UNION ALL
-    SELECT * FROM (SELECT '3v3', FALSE, NULL, NULL) AS tmp
+    SELECT * FROM (SELECT '3v3', FALSE, NULL, NULL, NULL) AS tmp
     WHERE NOT EXISTS (
         SELECT division FROM states WHERE division = '3v3'
     );
