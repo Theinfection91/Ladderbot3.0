@@ -163,13 +163,13 @@ def add_team_wins_losses(division_type: str, team_name: str, win: bool):
     if win:
         cursor.execute(f'''
         UPDATE teams
-        SET wins = wins + 1
+        SET wins = wins + 1, win_streak = win_streak + 1, lose_streak = 0
         WHERE team_name = ? AND division = ?
         ''', (team_name, division_type))
     else:
         cursor.execute(f'''
         UPDATE teams
-        SET losses = losses + 1
+        SET losses = losses + 1, lose_streak = lose_streak + 1, win_streak = 0
         WHERE team_name = ? AND division = ?
         ''', (team_name, division_type))
     
@@ -360,14 +360,14 @@ def db_update_rankings(division_type: str, winning_team: str, losing_team: str):
     # Update wins and losses
     cursor.execute(f'''
     UPDATE teams
-    SET wins = wins + 1
+    SET wins = wins + 1, win_streak = win_streak + 1, lose_streak = 0
     WHERE team_name = ?
     AND division = ?
     ''', (winning_team, division_type))
 
     cursor.execute(f'''
     UPDATE teams
-    SET losses = losses + 1
+    SET losses = losses + 1, lose_streak = lose_streak + 1, win_streak = 0
     WHERE team_name = ?
     AND division = ?
     ''', (losing_team, division_type))
@@ -392,9 +392,9 @@ def db_register_team(division_type: str, team_name: str, members: str):
 
     # INSERT data in correct division for the team
     cursor.execute('''
-        INSERT INTO teams (team_name, division, rank, wins, losses, members)
-        VALUES (?, ?, ?, ?, ?, ?)
-''', (team_name, division_type, starting_rank, default_win_loss, default_win_loss, members))
+        INSERT INTO teams (team_name, division, rank, wins, losses, members, win_streak, lose_streak)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+''', (team_name, division_type, starting_rank, default_win_loss, default_win_loss, members, default_win_loss, default_win_loss))
     
     # Commit and close the connection to the database
     conn.commit()

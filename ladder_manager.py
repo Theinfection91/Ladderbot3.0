@@ -48,11 +48,11 @@ class LadderManager:
 
         if division_type == '1v1':
             
-            db_register_team('1v1', "Alpha420", "Theinfection1991")
-            db_register_team('1v1', "BravoSquad", "Theinfection1991")
-            db_register_team('1v1', "Charlie-40-9'er", "Theinfection1991")
-            db_register_team('1v1', "Delta.X", "Theinfection1991")
-            db_register_team('1v1', "EchoOne", "Theinfection1991")
+            db_register_team('1v1', "Alpha", "Theinfection1991")
+            db_register_team('1v1', "Bravo", "Theinfection1991")
+            db_register_team('1v1', "Charlie", "Theinfection1991")
+            db_register_team('1v1', "Delta", "Theinfection1991")
+            db_register_team('1v1', "Echo", "Theinfection1991")
             return f"Created five 1v1 test teams"
         
         if division_type == '2v2':

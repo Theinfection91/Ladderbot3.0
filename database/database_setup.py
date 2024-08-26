@@ -31,7 +31,9 @@ def create_tables(conn):
         rank INTEGER NOT NULL,
         wins INTEGER NOT NULL,
         losses INTEGER NOT NULL,
-        members TEXT NOT NULL
+        members TEXT NOT NULL,
+        win_streak INTEGER NOT NULL,
+        lose_streak INTEGER NOT NULL
 )
 ''')
     
@@ -98,6 +100,25 @@ def create_tables(conn):
         SELECT division FROM states WHERE division = '3v3'
     );
     ''')
+
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS members (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    display_name TEXT NOT NULL,
+    discord_id INTEGER NOT NULL,
+    total_1v1_wins INTEGER NOT NULL,
+    total_1v1_losses INTEGER NOT NULL,
+    total_2v2_wins INTEGER NOT NULL,
+    total_2v2_losses INTEGER NOT NULL,
+    total_3v3_wins INTEGER NOT NULL,
+    total_3v3_losses INTEGER NOT NULL,
+    champion_1v1_title INTEGER NOT NULL,
+    champion_2v2_title INTEGER NOT NULL,
+    champion_3v3_title INTEGER NOT NULL,
+    all_teams_count INTEGER NOT NULL,
+    participation_count INTEGER NOT NULL                                             
+)
+''')
 
     # Commit the changes
     conn.commit()
