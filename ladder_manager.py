@@ -217,14 +217,15 @@ class LadderManager:
 
                     # Add team to the database with the given arguments
                     db_register_team(division_type, team_name, members_string)
+                    logger.info(f'LadderManager: Successfully created new team with following parameters: team_name={team_name} division_type={division_type} members={members_string}')
 
+                    # Checks if members on team are already in the members table for stat tracking
                     for member in members:
                         if not is_member_in_members_table(member.id):
                             db_register_member(member.display_name, member.id)
-                            print(f"registered {member.display_name} {member.id}")
+                            logger.info(f'LadderManager: Member on team not found in members table for stat tracking. Registering: {member.display_name} {member.id} to database')
 
                     # Return confirmation message
-                    logger.info(f'LadderManager: Successfully created new team with following parameters: team_name={team_name} division_type={division_type} members={members_string}')
                     return f"🎖️ Team {team_name} has been registered in the {division_type} division with the following members: {members_string} 🎖️"
                 
                 else:
