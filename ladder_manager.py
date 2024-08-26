@@ -1,7 +1,7 @@
 import discord
 from discord.ext import tasks
 
-from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel, is_standings_channel_set, get_standings_channel_id, is_challenges_channel_set, get_challenges_channel_id, db_clear_standings_channel, db_clear_challenges_channel, get_team_members, db_clear_all_challenges, db_clear_all_teams, get_teams_data, db_set_teams_channel, db_clear_teams_channel, is_teams_channel_set, get_teams_channel_id
+from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel, is_standings_channel_set, get_standings_channel_id, is_challenges_channel_set, get_challenges_channel_id, db_clear_standings_channel, db_clear_challenges_channel, get_team_members, db_clear_all_challenges, db_clear_all_teams, get_teams_data, db_set_teams_channel, db_clear_teams_channel, is_teams_channel_set, get_teams_channel_id, is_member_in_members_table, db_register_member
 
 from utils import is_correct_member_size, is_valid_division_type, has_duplicate_members, create_members_string, format_standings_data, format_challenges_data, format_teams_data, add_time_stamp
 
@@ -217,6 +217,11 @@ class LadderManager:
 
                     # Add team to the database with the given arguments
                     db_register_team(division_type, team_name, members_string)
+
+                    for member in members:
+                        if not is_member_in_members_table(member.id):
+                            db_register_member(member.display_name, member.id)
+                            print(f"registered {member.display_name} {member.id}")
 
                     # Return confirmation message
                     logger.info(f'LadderManager: Successfully created new team with following parameters: team_name={team_name} division_type={division_type} members={members_string}')
