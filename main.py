@@ -229,7 +229,7 @@ class Ladderbot(commands.Cog):
             Team Echo has challenged Team Delta in the 3v3 division!. -This challenge was created by an Administrator.
         """
         logger.info(f'Command "admin_challenge" invoked by {ctx.author} with challenger_team={challenger_team} challenged_team={challenged_team}')
-        result = self.ladder_manager.admin_challenge(challenger_team, challenged_team)
+        result = await self.ladder_manager.admin_challenge(ctx, challenger_team, challenged_team)
         await ctx.send(result)
     
     @commands.command()
@@ -284,7 +284,7 @@ class Ladderbot(commands.Cog):
             Team Delta has won the match against Team Echo, but no rank changes occur since Team Delta was the challenged team.
         """
         logger.info(f'Command "report_win" invoked by {ctx.author} with winning_team={winning_team}')
-        result = self.ladder_manager.report_win(ctx, winning_team)
+        result = await self.ladder_manager.report_win(ctx, winning_team)
         await ctx.send(result)
 
     @commands.command()
@@ -307,7 +307,7 @@ class Ladderbot(commands.Cog):
             Team Alpha has won the match against Team Charlie, but no rank changes occur since Team Alpha was the challenged team. This report was made by an Administrator.
         """
         logger.info(f'Command "admin_report_win" invoked by {ctx.author} with winning_team={winning_team}')
-        result = self.ladder_manager.admin_report_win(winning_team)
+        result = await self.ladder_manager.admin_report_win(ctx, winning_team)
         await ctx.send(result)
     
     @commands.command()
@@ -639,6 +639,22 @@ class Ladderbot(commands.Cog):
         logger.info(f'Command "clear_teams_channel" invoked by {ctx.author} with division_type={division_type}')
         result = self.ladder_manager.clear_teams_channel(division_type)
         await ctx.send(result)
+    
+    # NOTE: STATS RELATED COMMANDS
+
+    @commands.command()
+    async def my_stats(self, ctx):
+        """
+        TODO: Command to tell LadderManager to provide all stats tracked
+        for the caller of this command. The LadderManager requests a stat
+        report from the StatManager, who uses their tools of parsing the database
+        to compile a my_stats_report for the user based off of their Discord ID
+        which is gained from the ctx on the call itself.
+        """
+        logger.info(f'Command "my_stats" invoked by {ctx.author}')
+        result = self.ladder_manager.request_my_stats_report(ctx)
+        await ctx.send(result)
+
 
     @commands.command(name='show_help', help='Provides a link to the bot documentation.')
     async def show_help(self, ctx):

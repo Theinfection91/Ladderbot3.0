@@ -4,7 +4,7 @@ from discord.ext import tasks
 from stat_manager import StatManager
 from rival_manager import RivalManager
 
-from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel, is_standings_channel_set, get_standings_channel_id, is_challenges_channel_set, get_challenges_channel_id, db_clear_standings_channel, db_clear_challenges_channel, get_team_members, db_clear_all_challenges, db_clear_all_teams, get_teams_data, db_set_teams_channel, db_clear_teams_channel, is_teams_channel_set, get_teams_channel_id, is_member_in_members_table, db_register_member, increment_all_teams_count, add_division_win, add_division_loss
+from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel, is_standings_channel_set, get_standings_channel_id, is_challenges_channel_set, get_challenges_channel_id, db_clear_standings_channel, db_clear_challenges_channel, get_team_members, db_clear_all_challenges, db_clear_all_teams, get_teams_data, db_set_teams_channel, db_clear_teams_channel, is_teams_channel_set, get_teams_channel_id, is_member_in_members_table, db_register_member, add_division_win, add_division_loss
 
 from utils import is_correct_member_size, is_valid_division_type, has_duplicate_members, create_members_string, format_standings_data, format_challenges_data, format_teams_data, add_time_stamp
 
@@ -232,7 +232,7 @@ class LadderManager:
                             db_register_member(member.display_name, member.id)
                             logger.info(f'LadderManager: Member on team not found in members table for stat tracking. Registering: {member.display_name} {member.id} to database')
                         else:
-                            increment_all_teams_count(member.id)
+                            self.stat_manager.increment_all_teams_count(member.id)
                             logger.info(f'LadderManager: {member.display_name} {member.id} has had 1 added to their all_teams_count for stat tracking.')
 
                     # Return confirmation message
@@ -311,12 +311,14 @@ class LadderManager:
                     # If member is found, send a message displaying who challenged them
                     logger.info(f'LadderManager: Successfully sent challenge notification using parameters: challenger_team={challenger_team} challenged_team={challenged_team} | Sent notification to: members={members_string}')
                     await member.send(f"⚔️ Your team, Team {challenged_team}, has been challenged by Team {challenger_team} in the {division_type} division! ⚔️")
-                except discord.Forbidden:
-                    logger.error(f"Could not send a message to {member} (ID: {member_id}).")
-                    print(f"Could not send a message to {member} (ID: {member_id}).")
+                except all as e:
+                    error_message = f"Could not send a message to {member} (ID: {member_id})."
+                    logger.error(error_message)
+                    print(f"{error_message} Error: {str(e)}")
             else:
-                logger.error(f"LadderManager: Member with ID {member_id} not found.")
-                print(f"Member with ID {member_id} not found.")
+                error_message = f"LadderManager: Member with ID {member_id} not found."
+                logger.error(error_message)
+                print(error_message)
 
     async def challenge(self, ctx, challenger_team: str, challenged_team: str):
         """
@@ -386,10 +388,17 @@ class LadderManager:
         # Once all checks are passed then register the challenge in the correct table
         db_register_challenge(division_type, challenger_team, challenged_team)
 
-        # Send a notificaiton to members in challenged team
-        await self.send_challenge_notification(ctx, challenger_team, challenged_team)
+        try:
+            await self.send_challenge_notification(ctx, challenger_team, challenged_team)
+        except:
+            error_message = 'Error: Most likely tried to send notification to Bot'
+            logger.error(f'LadderManager: {error_message}')
+
         logger.info(f"LadderManager: A challenge in the {division_type} divison has been created between Team {challenger_team} with rank {challenger_rank} as the challenger and Team {challenged_team} with rank {challenged_rank} as the challenged team.")
-        return f"⚔️ Team {challenger_team} has challenged Team {challenged_team} in the {division_type} division! ⚔️"
+
+        result = f"⚔️ Team {challenger_team} has challenged Team {challenged_team} in the {division_type} division! ⚔️"
+        print(result)
+        return result
     
     def cancel_challenge(self, ctx, challenger_team: str):
         """
@@ -425,7 +434,7 @@ class LadderManager:
         logger.info(f"LadderManager: Successfully canceled the challenge made by {challenger_team} in the {team_division} division by {display_name}.")
         return f"🚩 The challenge made by Team {challenger_team} in the {team_division} division has been canceled by a team member. 🚩"
     
-    def admin_challenge(self, challenger_team: str, challenged_team: str):
+    async def admin_challenge(self, ctx, challenger_team: str, challenged_team: str):
         """
         This works the same way as challenge but removes the
         functionality of grabbing the display name to
@@ -483,6 +492,13 @@ class LadderManager:
         # Once all checks are passed then register the challenge in the correct table
         db_register_challenge(division_type, challenger_team, challenged_team)
         logger.info(f"LadderManager: A challenge in the {division_type} divison has been created between Team {challenger_team} with rank {challenger_rank} as the challenger and Team {challenged_team} with rank {challenged_rank} as the challenged team.")
+
+        # Send a notificaiton to members in challenged team
+        try:
+            await self.send_challenge_notification(ctx, challenger_team, challenged_team)
+        except:
+            print('Error: Most likely tried to send notification to Bot')
+
         return f"⚔️ Team {challenger_team} has challenged Team {challenged_team} in the {division_type} division! ⚔️ -This challenge was created by an Administrator."
     
     def admin_cancel_challenge(self, challenger_team: str):
@@ -509,7 +525,7 @@ class LadderManager:
         logger.info(f"LadderManager: Successfully canceled the challenge made by {challenger_team} in the {team_division} division by an Admin.")
         return f"🚩 The challenge made by Team {challenger_team} in the {team_division} division has been canceled by an Administrator. 🚩"
     
-    def report_win(self, ctx, winning_team: str):
+    async def report_win(self, ctx, winning_team: str):
         """
         Checks if there is a challenge involving the team name given,
         determines the losing team based on the winning team,
@@ -546,9 +562,21 @@ class LadderManager:
             db_update_rankings(division_type, winning_team, losing_team)
             logger.info(f"LadderManager: Winning challenger team: {winning_team} takes the losing challenged team: {losing_team} rank and challenged losing team moves down one rank. Win and loss is added to appropriate teams.")
 
-            # TODO: Grab ID's of members to add to stat tracking logic
+            #Grab ID's of members to add to stat tracking logic
             winner_members = get_team_members(winning_team)
             loser_members = get_team_members(losing_team)
+            guild = ctx.guild
+
+            # Pass information to StatManager to update individual wins and losses for players
+            for winner_member in winner_members:
+                winner_member_id = await self.get_member_id_from_display_names(guild, winner_member)
+                for win_id in winner_member_id:
+                    self.stat_manager.add_to_wins_count(win_id, division_type)
+            
+            for loser_member in loser_members:
+                loser_member_id = await self.get_member_id_from_display_names(guild, loser_member)
+                for loss_id in loser_member_id:
+                    self.stat_manager.add_to_losses_count(loss_id, division_type)
 
             remove_challenge(division_type, winning_team)
             logger.info(f"LadderManager: Challenge from {division_type} division involving Team {winning_team} and Team {losing_team} removed from database.")
@@ -557,9 +585,27 @@ class LadderManager:
         else:
             # If the winning team was the challenged team, no rank change occurs
             losing_team = find_opponent_team(division_type, winning_team)
+
+            #Grab ID's of members to add to stat tracking logic
+            winner_members = get_team_members(winning_team)
+            loser_members = get_team_members(losing_team)
+            guild = ctx.guild
+
+            # Pass information to StatManager to update individual wins and losses for players
+            for winner_member in winner_members:
+                winner_member_id = await self.get_member_id_from_display_names(guild, winner_member)
+                for win_id in winner_member_id:
+                    self.stat_manager.add_to_wins_count(win_id, division_type)
             
+            for loser_member in loser_members:
+                loser_member_id = await self.get_member_id_from_display_names(guild, loser_member)
+                for loss_id in loser_member_id:
+                    self.stat_manager.add_to_losses_count(loss_id, division_type)
+            
+            # LadderManager adds team wins and losses
             add_team_wins_losses(division_type, winning_team, win=True)
             add_team_wins_losses(division_type, losing_team, win=False)
+
             logger.info(f"LadderManager: Team {winning_team} has won against Team {losing_team} in the {division_type} division, no rank change occurs since {winning_team} was the challenged team.")
             
             remove_challenge(division_type, losing_team)
@@ -567,7 +613,7 @@ class LadderManager:
             
             return f"🏆 Team {winning_team} has won the match against Team {losing_team}, but no rank changes occur since Team {winning_team} was the challenged team. 🏆"
     
-    def admin_report_win(self, winning_team: str):
+    async def admin_report_win(self, ctx, winning_team: str):
         """
         Admin method for reporting wins between teams
         Works just like report_win but doesnt check
@@ -596,6 +642,22 @@ class LadderManager:
             db_update_rankings(division_type, winning_team, losing_team)
             logger.info(f"LadderManager: 'admin_report_win' Winning challenger team: {winning_team} takes the losing challenged team: {losing_team} rank and challenged losing team moves down one rank. Win and loss is added to appropriate teams.")
             
+            #Grab ID's of members to add to stat tracking logic
+            winner_members = get_team_members(winning_team)
+            loser_members = get_team_members(losing_team)
+            guild = ctx.guild
+
+            # Pass information to StatManager to update individual wins and losses for players
+            for winner_member in winner_members:
+                winner_member_id = await self.get_member_id_from_display_names(guild, winner_member)
+                for win_id in winner_member_id:
+                    self.stat_manager.add_to_wins_count(win_id, division_type)
+            
+            for loser_member in loser_members:
+                loser_member_id = await self.get_member_id_from_display_names(guild, loser_member)
+                for loss_id in loser_member_id:
+                    self.stat_manager.add_to_losses_count(loss_id, division_type)
+
             # Remove the challenge
             remove_challenge(division_type, winning_team)
             logger.info(f"LadderManager: 'admin_report_win' Challenge from {division_type} division involving Team {winning_team} and Team {losing_team} removed from database.")
@@ -604,6 +666,22 @@ class LadderManager:
         else:
             # If the winning team was the challenged team, no rank change occurs
             losing_team = find_opponent_team(division_type, winning_team)
+
+            #Grab ID's of members to add to stat tracking logic
+            winner_members = get_team_members(winning_team)
+            loser_members = get_team_members(losing_team)
+            guild = ctx.guild
+
+            # Pass information to StatManager to update individual wins and losses for players
+            for winner_member in winner_members:
+                winner_member_id = await self.get_member_id_from_display_names(guild, winner_member)
+                for win_id in winner_member_id:
+                    self.stat_manager.add_to_wins_count(win_id, division_type)
+            
+            for loser_member in loser_members:
+                loser_member_id = await self.get_member_id_from_display_names(guild, loser_member)
+                for loss_id in loser_member_id:
+                    self.stat_manager.add_to_losses_count(loss_id, division_type)
             
             # Add win/loss to correct team, no rank change when challenged team wins
             add_team_wins_losses(division_type, winning_team, win=True)
@@ -1072,3 +1150,14 @@ class LadderManager:
                 channel = self.bot.get_channel(channel_id)
                 if isinstance(channel, discord.TextChannel):
                     await self.update_teams_message(division_type, channel)
+    
+    def request_my_stats_report(self, ctx):
+        """
+        Tells the StatManager to send a report
+        of the caller of the my_stats command which
+        is then sent back to the caller of the command
+        """
+        discord_id = ctx.author.id
+        print(discord_id)
+        my_stats_report = self.stat_manager.create_my_stats_report(discord_id)
+        return my_stats_report

@@ -40,9 +40,9 @@ def add_division_win(discord_id, division_type):
 
     cursor.execute(f"UPDATE members SET total_{division_type}_wins = total_{division_type}_wins + 1 WHERE discord_id = ?", (discord_id,))
 
-    conn.close()
     conn.commit()
-
+    conn.close()
+    
 def add_division_loss(discord_id, division_type):
     """
     Used to increment divisional losses for members stats
@@ -52,8 +52,8 @@ def add_division_loss(discord_id, division_type):
 
     cursor.execute(f"UPDATE members SET total_{division_type}_losses = total_{division_type}_losses + 1 WHERE discord_id = ?", (discord_id,))
 
-    conn.close()
     conn.commit()
+    conn.close()    
 
 def get_player_stats(discord_id):
     """
@@ -61,9 +61,11 @@ def get_player_stats(discord_id):
     """
     conn = connect_db()
     cursor = conn.cursor()
+    print("inside db")
 
     cursor.execute("SELECT * FROM members WHERE discord_id = ?", (discord_id,))
     stats = cursor.fetchall()
+    print(stats)
 
     conn.close()
 

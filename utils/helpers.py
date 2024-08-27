@@ -96,3 +96,37 @@ async def add_time_stamp():
     formatted_time_stamp = f"\n\nLast updated: {readable_time_stamp}"
 
     return formatted_time_stamp
+
+def format_my_stats_report(raw_stats_report):
+    """
+    Formats raw stats data into a detailed report for a player.
+    Args:
+        raw_stats_report (list of tuple): The raw stats data for a player from the database.
+    Returns:
+        str: A formatted stats report.
+    """
+    if not raw_stats_report or not raw_stats_report[0]:
+        return "No stats available."
+
+    # Unpack the first tuple in the list
+    _, display_name, _, total_1v1_wins, total_1v1_losses, total_2v2_wins, total_2v2_losses, \
+    total_3v3_wins, total_3v3_losses, champion_1v1_title, champion_2v2_title, \
+    champion_3v3_title, all_teams_count, participation_count = raw_stats_report[0]
+
+    # Create the formatted report
+    report = f"📊 **{display_name}'s Stats Report** 📊\n"
+    report += "```\n"
+    report += f"Total 1v1 Wins: {total_1v1_wins}\n"
+    report += f"Total 1v1 Losses: {total_1v1_losses}\n"
+    report += f"Total 2v2 Wins: {total_2v2_wins}\n"
+    report += f"Total 2v2 Losses: {total_2v2_losses}\n"
+    report += f"Total 3v3 Wins: {total_3v3_wins}\n"
+    report += f"Total 3v3 Losses: {total_3v3_losses}\n"
+    report += f"1v1 Champion Titles: {champion_1v1_title}\n"
+    report += f"2v2 Champion Titles: {champion_2v2_title}\n"
+    report += f"3v3 Champion Titles: {champion_3v3_title}\n"
+    report += f"Total Team Count: {all_teams_count}\n"
+    report += f"Total Match Count: {participation_count}\n"
+    report += "```"
+
+    return report

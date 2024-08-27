@@ -3,9 +3,10 @@ from logging.handlers import RotatingFileHandler
 import os
 
 # Directory for logs
-log_dir = os.path.expanduser('~/logs')
-if not os.path.exists(log_dir):
-    os.makedirs(log_dir)
+log_dir = 'logs'
+
+#if not os.path.exists(log_dir):
+    #os.makedirs(log_dir)
 
 # Log file path
 log_file = os.path.join(log_dir, 'ladderbot.log')
