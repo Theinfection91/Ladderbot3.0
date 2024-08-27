@@ -31,6 +31,44 @@ def increment_all_teams_count(discord_id):
     conn.commit()
     conn.close()
 
+def add_division_win(discord_id, division_type):
+    """
+    Used to increment divisional wins for members stats
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute(f"UPDATE members SET total_{division_type}_wins = total_{division_type}_wins + 1 WHERE discord_id = ?", (discord_id,))
+
+    conn.close()
+    conn.commit()
+
+def add_division_loss(discord_id, division_type):
+    """
+    Used to increment divisional losses for members stats
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute(f"UPDATE members SET total_{division_type}_losses = total_{division_type}_losses + 1 WHERE discord_id = ?", (discord_id,))
+
+    conn.close()
+    conn.commit()
+
+def get_player_stats(discord_id):
+    """
+    
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM members WHERE discord_id = ?", (discord_id,))
+    stats = cursor.fetchall()
+
+    conn.close()
+
+    return stats
+
 def db_register_member(display_name, discord_id):
     """
     Adds new member to the members table

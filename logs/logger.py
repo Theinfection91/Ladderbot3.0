@@ -3,7 +3,7 @@ from logging.handlers import RotatingFileHandler
 import os
 
 # Directory for logs
-log_dir = 'logs'
+log_dir = os.path.expanduser('~/logs')
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
