@@ -1,6 +1,6 @@
 import discord
 
-from database import get_player_stats, increment_all_teams_count, add_division_win, add_division_loss
+from database import get_player_stats, increment_all_teams_count, increment_participation_count, add_division_win, add_division_loss
 
 from utils import format_my_stats_report
 
@@ -33,6 +33,13 @@ class StatManager:
         Used when a player registers for a new team
         """
         increment_all_teams_count(discord_id)
+
+    def increment_participation_count(self, discord_id):
+        """
+        Add ONE (1) to participation_count (match count)
+        for player stat tracking
+        """
+        increment_participation_count(discord_id)
 
     def add_to_wins_count(self, discord_id, division_type):
         """

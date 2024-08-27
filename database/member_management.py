@@ -31,6 +31,18 @@ def increment_all_teams_count(discord_id):
     conn.commit()
     conn.close()
 
+def increment_participation_count(discord_id):
+    """
+    
+    """
+    conn = connect_db()
+    cursor = conn.cursor()
+
+    cursor.execute("UPDATE members SET participation_count = participation_count + 1 WHERE discord_id = ?", (discord_id,))
+
+    conn.commit()
+    conn.close()
+
 def add_division_win(discord_id, division_type):
     """
     Used to increment divisional wins for members stats

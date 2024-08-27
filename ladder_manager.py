@@ -572,11 +572,13 @@ class LadderManager:
                 winner_member_id = await self.get_member_id_from_display_names(guild, winner_member)
                 for win_id in winner_member_id:
                     self.stat_manager.add_to_wins_count(win_id, division_type)
+                    self.stat_manager.increment_participation_count(win_id)
             
             for loser_member in loser_members:
                 loser_member_id = await self.get_member_id_from_display_names(guild, loser_member)
                 for loss_id in loser_member_id:
                     self.stat_manager.add_to_losses_count(loss_id, division_type)
+                    self.stat_manager.increment_participation_count(loss_id)
 
             remove_challenge(division_type, winning_team)
             logger.info(f"LadderManager: Challenge from {division_type} division involving Team {winning_team} and Team {losing_team} removed from database.")
@@ -596,11 +598,13 @@ class LadderManager:
                 winner_member_id = await self.get_member_id_from_display_names(guild, winner_member)
                 for win_id in winner_member_id:
                     self.stat_manager.add_to_wins_count(win_id, division_type)
+                    self.stat_manager.increment_participation_count(win_id)
             
             for loser_member in loser_members:
                 loser_member_id = await self.get_member_id_from_display_names(guild, loser_member)
                 for loss_id in loser_member_id:
                     self.stat_manager.add_to_losses_count(loss_id, division_type)
+                    self.stat_manager.increment_participation_count(loss_id)
             
             # LadderManager adds team wins and losses
             add_team_wins_losses(division_type, winning_team, win=True)
@@ -652,11 +656,13 @@ class LadderManager:
                 winner_member_id = await self.get_member_id_from_display_names(guild, winner_member)
                 for win_id in winner_member_id:
                     self.stat_manager.add_to_wins_count(win_id, division_type)
+                    self.stat_manager.increment_participation_count(win_id)
             
             for loser_member in loser_members:
                 loser_member_id = await self.get_member_id_from_display_names(guild, loser_member)
                 for loss_id in loser_member_id:
                     self.stat_manager.add_to_losses_count(loss_id, division_type)
+                    self.stat_manager.increment_participation_count(loss_id)
 
             # Remove the challenge
             remove_challenge(division_type, winning_team)
@@ -677,11 +683,13 @@ class LadderManager:
                 winner_member_id = await self.get_member_id_from_display_names(guild, winner_member)
                 for win_id in winner_member_id:
                     self.stat_manager.add_to_wins_count(win_id, division_type)
+                    self.stat_manager.increment_participation_count(win_id)
             
             for loser_member in loser_members:
                 loser_member_id = await self.get_member_id_from_display_names(guild, loser_member)
                 for loss_id in loser_member_id:
                     self.stat_manager.add_to_losses_count(loss_id, division_type)
+                    self.stat_manager.increment_participation_count(loss_id)
             
             # Add win/loss to correct team, no rank change when challenged team wins
             add_team_wins_losses(division_type, winning_team, win=True)
