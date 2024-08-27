@@ -55,27 +55,27 @@ class LadderManager:
 
         if division_type == '1v1':
             
-            db_register_team('1v1', "Alpha", "Theinfection1991")
-            db_register_team('1v1', "Bravo", "Theinfection1991")
-            db_register_team('1v1', "Charlie", "Theinfection1991")
-            db_register_team('1v1', "Delta", "Theinfection1991")
-            db_register_team('1v1', "Echo", "Theinfection1991")
+            db_register_team('1v1', "Alpha", "TestName1")
+            db_register_team('1v1', "Bravo", "TestName2")
+            db_register_team('1v1', "Charlie", "TestName3")
+            db_register_team('1v1', "Delta", "TestName4")
+            db_register_team('1v1', "Echo", "TestName5")
             return f"Created five 1v1 test teams"
         
         if division_type == '2v2':
-            db_register_team('2v2', "A.pp.le", "Theinfection1991, Ladderbot3.0")
-            db_register_team('2v2', "Butler", "Theinfection1991, Ladderbot3.0")
-            db_register_team('2v2', "Carlos466", "Theinfection1991, Ladderbot3.0")
-            db_register_team('2v2', "__Dynasty__", "Theinfection1991, Ladderbot3.0")
-            db_register_team('2v2', "Ell-en", "Theinfection1991, Ladderbot3.0")
+            db_register_team('2v2', "Apple", "TestName1, TestName10")
+            db_register_team('2v2', "Butler", "TestName2, TestName1337")
+            db_register_team('2v2', "Carlos", "TestName123165, TestName112312")
+            db_register_team('2v2', "Dynasty", "TestName3425, TestName15234123")
+            db_register_team('2v2', "Ellen", "TestName11323, TestName1123124")
             return f"Created five 2v2 test teams"
         
         if division_type == '3v3':
-            db_register_team('3v3', "AngelWing", "Theinfection1991, Ladderbot3.0, TestNameLength")
-            db_register_team('3v3', "Bittersweet", "Theinfection1991, Ladderbot3.0, TestNameLength")
-            db_register_team('3v3', "Corn", "Theinfection1991, Ladderbot3.0, TestNameLength")
-            db_register_team('3v3', "DeerDiary", "Theinfection1991, Ladderbot3.0, TestNameLength")
-            db_register_team('3v3', "Extaseeeeeeeeee", "Theinfection1991, Ladderbot3.0, TestNameLength")
+            db_register_team('3v3', "AngelWing", "Theinfection1991, TestName87650, TestNameLength")
+            db_register_team('3v3', "Bittersweet", "TestName12435, TestName654, TestName1267544")
+            db_register_team('3v3', "Corn", "TestName3242634, Ladderbot3, TestName96")
+            db_register_team('3v3', "DeerDiary", "TestName323266, TestName73546, TestNamTestNameeLength")
+            db_register_team('3v3', "Elephant", "TestName2632464, LadTestNameTestNamederbot3, TestName6t234652Length")
             return f"Created five 3v3 test teams"
   
     async def on_ready(self):
@@ -397,7 +397,6 @@ class LadderManager:
         logger.info(f"LadderManager: A challenge in the {division_type} divison has been created between Team {challenger_team} with rank {challenger_rank} as the challenger and Team {challenged_team} with rank {challenged_rank} as the challenged team.")
 
         result = f"⚔️ Team {challenger_team} has challenged Team {challenged_team} in the {division_type} division! ⚔️"
-        print(result)
         return result
     
     def cancel_challenge(self, ctx, challenger_team: str):
@@ -1166,6 +1165,5 @@ class LadderManager:
         is then sent back to the caller of the command
         """
         discord_id = ctx.author.id
-        print(discord_id)
         my_stats_report = self.stat_manager.create_my_stats_report(discord_id)
         return my_stats_report

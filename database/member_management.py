@@ -73,11 +73,9 @@ def get_player_stats(discord_id):
     """
     conn = connect_db()
     cursor = conn.cursor()
-    print("inside db")
 
     cursor.execute("SELECT * FROM members WHERE discord_id = ?", (discord_id,))
     stats = cursor.fetchall()
-    print(stats)
 
     conn.close()
 
