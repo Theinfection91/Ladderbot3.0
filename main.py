@@ -159,7 +159,7 @@ class Ladderbot(commands.Cog):
         result = self.ladder_manager.remove_team(team_name)
         await ctx.send(result)
 
-    @commands.command()
+    @commands.command(aliases=['c'])
     async def challenge(self, ctx, challenger_team: str, challenged_team: str):
         """
         This challenge function will be usable by everyone

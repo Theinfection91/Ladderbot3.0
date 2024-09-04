@@ -4,7 +4,7 @@ from discord.ext import tasks
 from stat_manager import StatManager
 from rival_manager import RivalManager
 
-from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel, is_standings_channel_set, get_standings_channel_id, is_challenges_channel_set, get_challenges_channel_id, db_clear_standings_channel, db_clear_challenges_channel, get_team_members, db_clear_all_challenges, db_clear_all_teams, get_teams_data, db_set_teams_channel, db_clear_teams_channel, is_teams_channel_set, get_teams_channel_id, is_member_in_members_table, db_register_member, add_division_win, add_division_loss
+from database import initialize_database, count_teams, db_register_team, db_remove_team, db_set_rank, db_update_rankings, is_team_name_unique, is_member_registered, is_member_on_team, check_team_division, does_team_exist, is_team_challenged, has_team_challenged, find_opponent_team, give_team_rank, db_register_challenge, db_remove_challenge, add_team_wins_losses, remove_challenge, is_ladder_running, set_ladder_running, subtract_team_wins_losses, get_wins_or_losses, get_standings_data, get_challenges_data, db_set_standings_channel, db_set_challenges_channel, is_standings_channel_set, get_standings_channel_id, is_challenges_channel_set, get_challenges_channel_id, db_clear_standings_channel, db_clear_challenges_channel, get_team_members, db_clear_all_challenges, db_clear_all_teams, get_teams_data, db_set_teams_channel, db_clear_teams_channel, is_teams_channel_set, get_teams_channel_id, is_member_in_members_table, db_register_member
 
 from utils import is_correct_member_size, is_valid_division_type, has_duplicate_members, create_members_string, format_standings_data, format_challenges_data, format_teams_data, add_time_stamp
 
@@ -122,7 +122,7 @@ class LadderManager:
             else:
                 logger.warning(f'LadderManager: "on_ready" no standings channel set for {division_type} division.')
             
-            # Standings Channel Logic
+            # Teams Channel Logic
             if is_teams_channel_set(division_type):
                 teams_channel_id = get_teams_channel_id(division_type)
                 teams_channel = self.bot.get_channel(teams_channel_id)
@@ -198,9 +198,6 @@ class LadderManager:
                 # Check if correct amount of members was given for the division type
                 if is_correct_member_size(division_type, *members):
 
-                    # NOTE: Uncomment triple quotes to check if member is already registered on division type team
-                    #-----------------------------------------------
-
                     # Create a list of all the members display names
                     member_display_names = [member.display_name for member in members]
 
@@ -216,8 +213,6 @@ class LadderManager:
                     if has_duplicate_members(members):
                         logger.error(f'LadderManager: The same member is trying to be registered to the same team twice: division_type={division_type} members={member_display_names}')
                         return f"❌ You are trying to register the same member twice. Please try again. Members entered: {member_display_names} ❌"
-                    
-                    # NOTE :----------------------------------------
                         
                     # Turn all members into a string for the database
                     members_string = create_members_string(*members)

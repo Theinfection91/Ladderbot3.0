@@ -403,19 +403,36 @@ def db_register_team(division_type: str, team_name: str, members: str):
 def db_remove_team(division_type: str, team_name: str):
     """
     DELETE's a given team from a given division
-    in the ladderbot.db
+    in the ladderbot.db and updates the ranks accordingly.
     """
     # Connect to ladderbot.db and create cursor
     conn = connect_db()
     cursor = conn.cursor()
 
-    # DELETE data with specified parameters
+    # DELETE the specified team
     cursor.execute("DELETE FROM teams WHERE team_name = ? AND division = ?", (team_name, division_type))
 
-    # Commit and close connection
+    # Retrieve and store all remaining teams' ranks in the division
+    cursor.execute(f'''
+    SELECT team_name FROM teams
+    WHERE division = ?
+    ORDER BY rank
+    ''', (division_type,))
+    remaining_teams = cursor.fetchall()
+
+    # Update ranks of remaining teams
+    for index, (team_name,) in enumerate(remaining_teams):
+        cursor.execute(f'''
+        UPDATE teams
+        SET rank = ?
+        WHERE team_name = ?
+        AND division = ?
+        ''', (index + 1, team_name, division_type))
+
+    # Commit changes and close the connection
     conn.commit()
     conn.close()
-
+    
 def db_clear_all_teams(division_type: str):
     """
     Clear all teams in the given division from the database.
