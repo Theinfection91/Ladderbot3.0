@@ -23,12 +23,12 @@ def format_standings_data(division_type: str, raw_standings_data):
     # Prepare the standings message
     header = f"🏆 **{division_type.upper()} Division Standings** 🏆\n"
     header += "```\n"
-    header += "| Rank | Team Name       | Wins | Losses |\n"
-    header += "|------|-----------------|------|--------|\n"
+    header += "| Rank | Team Name                 | Wins | Losses |\n"
+    header += "|------|---------------------------|------|--------|\n"
 
     standings_lines = [
-        f"| {rank:<4} | {team_name:<15} | {wins:<4} | {losses:<6} |"
-        "\n|------|-----------------|------|--------|"
+        f"| {rank:<4} | {team_name:<23}   | {wins:<4} | {losses:<6} |"
+        "\n|------|---------------------------|------|--------|"
         for team_name, rank, wins, losses in raw_standings_data
     ]
 
@@ -45,12 +45,12 @@ def format_challenges_data(division_type: str, raw_challenges_data):
     # Prepare the challenges message
     header = f"⚔️ **{division_type.upper()} Division Challenges** ⚔️\n"
     header += "```\n"
-    header += "| Challenger         | Challenged         |\n"
-    header += "|--------------------|--------------------|\n"
+    header += "| Challenger              | Challenged              |\n"
+    header += "|-------------------------|-------------------------|\n"
 
     challenges_lines = [
-        f"| {challenger:<18} | {challenged:<18} |"
-        "\n|--------------------|--------------------|"
+        f"| {challenger:<23} | {challenged:<23} |"
+        "\n|-------------------------|-------------------------|"
         for challenger, challenged in raw_challenges_data
     ]
 
@@ -67,15 +67,15 @@ def format_teams_data(division_type: str, raw_teams_data):
     # Prepare the teams message
     header = f"👥 **{division_type.upper()} Division Teams** 👥\n"
     header += "```\n"
-    header += "| Team Name         | Members                         \n"
-    header += "|-------------------|---------------------------------\n"
+    header += "| Team Name                 | Members                            \n"
+    header += "|---------------------------|------------------------------------\n"
 
     # Calculate the max width for the members column
     members_col_width = 32  # Adjust this value as needed
 
     teams_lines = [
-        f"| {team_name:<17} | {members:<{members_col_width}} "
-        "\n|-------------------|---------------------------------"
+        f"| {team_name:<23}   | {members:<{members_col_width}} "
+        "\n|---------------------------|------------------------------------"
         for team_name, members in raw_teams_data
     ]
 
